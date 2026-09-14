@@ -4,15 +4,15 @@
   "feeds": [
     {
       "name": "PIB Press Releases",
-      "url": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
-      "warm": "https://www.pib.gov.in/index.aspx?reg=3&lang=1",
-      "fallback": "https://www.pib.gov.in/ViewRss.aspx?reg=3&lang=1",
+      "url": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=48",
+      "warm": "https://www.pib.gov.in/indexd.aspx?lang=1&reg=48",
+      "fallback": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
       "publisher": "Press Information Bureau",
       "official": true,
       "gate": true
     },
 
-    { "name": "MoRTH and ministry releases", "query": "site:pib.gov.in road transport highways OR railways OR shipping OR civil aviation", "gate": false },
+    { "name": "MoRTH and ministry releases", "query": "site:pib.gov.in road transport highways OR railways OR shipping OR civil aviation", "gate": false, "official": true, "publisher": "Press Information Bureau" },
 
     { "name": "NHAI & national highway projects", "query": "NHAI OR \"National Highways Authority of India\" highway project", "gate": false },
     { "name": "Highway awards & bids", "query": "NHAI highway project awarded OR bid OR \"HAM\" OR \"BOT toll\"", "gate": false },
