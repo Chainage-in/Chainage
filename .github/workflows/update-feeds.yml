@@ -1,0 +1,62 @@
+name: Update feeds
+
+on:
+  schedule:
+    # 06:30, 13:30 and 19:30 IST (cron runs in UTC)
+    - cron: "0 1,8,14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: update-feeds
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Collect headlines
+        run: node scripts/fetch-feeds.mjs
+
+      - name: Refresh indicators and source reports
+        continue-on-error: true
+        run: node scripts/fetch-indicators.mjs
+
+      # Wikipedia background is slow-changing, so refresh it once a day at most.
+      - name: Refresh corridor background (Wikipedia)
+        continue-on-error: true
+        run: node scripts/fetch-wikipedia.mjs
+
+      - name: Commit updated feed
+        run: |
+          git config user.name "chainage-bot"
+          git config user.email "actions@github.com"
+          git add data/news.json data/history.json data/indicators.json sitemap.xml 2>/dev/null || git add data/news.json
+          if git diff --staged --quiet; then
+            echo "No change in feed data."
+          else
+            git commit -m "Update feed data ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git push
+          fi
+
+      # GitHub switches off scheduled workflows in public repositories after
+      # 60 days without activity. Re-enabling the workflow on every run resets
+      # that clock, so the feed keeps updating without anyone touching the repo.
+      - name: Keep the schedule alive
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PUT \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/update-feeds.yml/enable" \
+            && echo "Schedule re-armed." \
+            || echo "Could not re-arm schedule; check Actions permissions."
