@@ -4,11 +4,15 @@
   "feeds": [
     {
       "name": "PIB Press Releases",
-      "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+      "url": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+      "warm": "https://www.pib.gov.in/index.aspx?reg=3&lang=1",
+      "fallback": "https://www.pib.gov.in/ViewRss.aspx?reg=3&lang=1",
       "publisher": "Press Information Bureau",
       "official": true,
       "gate": true
     },
+
+    { "name": "MoRTH and ministry releases", "query": "site:pib.gov.in road transport highways OR railways OR shipping OR civil aviation", "gate": false },
 
     { "name": "NHAI & national highway projects", "query": "NHAI OR \"National Highways Authority of India\" highway project", "gate": false },
     { "name": "Highway awards & bids", "query": "NHAI highway project awarded OR bid OR \"HAM\" OR \"BOT toll\"", "gate": false },
@@ -29,7 +33,7 @@
 
     { "name": "Logistics & Gati Shakti", "query": "India logistics cost OR \"PM Gati Shakti\" OR multimodal corridor", "gate": false },
     { "name": "Fuel prices & transport cost", "query": "India diesel price OR crude oil impact transport OR trucking freight rates", "gate": false },
-    { "name": "Mining, industry & freight demand", "query": "India coal OR iron ore OR cement dispatch transport movement restriction", "gate": false },
+    { "name": "Mining, industry & freight demand", "query": "India (\"iron ore\" OR coal OR cement OR steel) (dispatch OR production OR ban OR output)", "gate": false },
     { "name": "Global events affecting Indian trade", "query": "global tariffs OR trade war impact India exports imports logistics", "gate": false },
     { "name": "Macro demand indicators", "query": "India GDP OR industrial output OR e-way bill OR vehicle sales impact freight", "gate": false },
     { "name": "Strikes, bandhs & disruptions", "query": "India transporters strike OR bandh OR truckers protest highway disruption", "gate": false }
