@@ -1,0 +1,37 @@
+{
+  "_note": "Edit this file to add or remove sources. 'gate': true means items must contain a transport keyword to be kept (used for broad feeds like PIB). Google News queries are already targeted, so they use gate: false.",
+  "googleNewsTemplate": "https://news.google.com/rss/search?q={QUERY}&hl=en-IN&gl=IN&ceid=IN:en",
+  "feeds": [
+    {
+      "name": "PIB Press Releases",
+      "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+      "publisher": "Press Information Bureau",
+      "official": true,
+      "gate": true
+    },
+
+    { "name": "NHAI & national highway projects", "query": "NHAI OR \"National Highways Authority of India\" highway project", "gate": false },
+    { "name": "Highway awards & bids", "query": "NHAI highway project awarded OR bid OR \"HAM\" OR \"BOT toll\"", "gate": false },
+    { "name": "TOT & asset monetisation", "query": "\"Toll Operate Transfer\" OR \"TOT bundle\" OR \"asset monetisation\" highway India", "gate": false },
+    { "name": "Tolling, tariffs & FASTag", "query": "toll plaza OR toll rate OR FASTag OR \"annual pass\" India highway fee", "gate": false },
+    { "name": "Expressways under construction", "query": "expressway India construction progress OR opened OR commissioned", "gate": false },
+    { "name": "Highway closures & diversions", "query": "highway closed OR diversion OR landslide OR flood damage national highway India", "gate": false },
+
+    { "name": "Railways, new lines & capacity", "query": "Indian Railways new line OR doubling OR electrification project sanctioned", "gate": false },
+    { "name": "Dedicated Freight Corridor", "query": "\"Dedicated Freight Corridor\" OR DFCCIL freight traffic", "gate": false },
+    { "name": "Rail freight loading", "query": "Indian Railways freight loading OR originating traffic tonnes", "gate": false },
+
+    { "name": "Airports & aviation capacity", "query": "India airport new terminal OR expansion OR greenfield airport passenger traffic", "gate": false },
+    { "name": "Air traffic & routes", "query": "India domestic air passenger traffic DGCA OR new route airline", "gate": false },
+
+    { "name": "Ports & cargo throughput", "query": "India port cargo traffic OR throughput OR container volumes major ports", "gate": false },
+    { "name": "Shipping & trade routes", "query": "India shipping route OR freight rate OR Red Sea OR Suez impact trade", "gate": false },
+
+    { "name": "Logistics & Gati Shakti", "query": "India logistics cost OR \"PM Gati Shakti\" OR multimodal corridor", "gate": false },
+    { "name": "Fuel prices & transport cost", "query": "India diesel price OR crude oil impact transport OR trucking freight rates", "gate": false },
+    { "name": "Mining, industry & freight demand", "query": "India coal OR iron ore OR cement dispatch transport movement restriction", "gate": false },
+    { "name": "Global events affecting Indian trade", "query": "global tariffs OR trade war impact India exports imports logistics", "gate": false },
+    { "name": "Macro demand indicators", "query": "India GDP OR industrial output OR e-way bill OR vehicle sales impact freight", "gate": false },
+    { "name": "Strikes, bandhs & disruptions", "query": "India transporters strike OR bandh OR truckers protest highway disruption", "gate": false }
+  ]
+}

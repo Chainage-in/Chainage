@@ -1,0 +1,10 @@
+series,date,value,unit,category,region,corridor,plaza,source,sourceurl
+WPI All Commodities,2024-04,151.2,index,Prices,India,,,Office of the Economic Adviser,https://eaindustry.nic.in
+WPI All Commodities,2024-05,152.0,index,Prices,India,,,Office of the Economic Adviser,https://eaindustry.nic.in
+WPI All Commodities,2024-06,152.8,index,Prices,India,,,Office of the Economic Adviser,https://eaindustry.nic.in
+Bihar GSDP current prices,FY-22-23,742000,Rs crore,Output,Bihar,,,MoSPI,https://mospi.gov.in
+Bihar GSDP current prices,FY-23-24,801000,Rs crore,Output,Bihar,,,MoSPI,https://mospi.gov.in
+Gorhi plaza monthly transactions,2026-06,412000,transactions,Toll,Bihar,NH-27,Gorhi,IHMCL Jun 2026 report,https://ihmcl.co.in/etc-transaction-reports/
+Gorhi plaza monthly transactions,2026-07,428500,transactions,Toll,Bihar,NH-27,Gorhi,IHMCL Jul 2026 report,https://ihmcl.co.in/etc-transaction-reports/
+Gorhi plaza monthly collection,2026-06,31.4,Rs crore,Toll,Bihar,NH-27,Gorhi,IHMCL Jun 2026 report,https://ihmcl.co.in/etc-transaction-reports/
+Gorhi plaza monthly collection,2026-07,32.9,Rs crore,Toll,Bihar,NH-27,Gorhi,IHMCL Jul 2026 report,https://ihmcl.co.in/etc-transaction-reports/
