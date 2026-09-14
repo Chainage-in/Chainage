@@ -464,8 +464,14 @@ async function main() {
   for (const t of targets) {
     try {
       const cookie = t.warm ? await warmSession(t.warm) : "";
-      let xml = await fetchText(t.url, cookie);
-      let items = parseFeed(xml);
+      let items = parseFeed(await fetchText(t.url, cookie));
+
+      // Publishers rate-limit intermittently and answer with an empty feed
+      // rather than an error, so one quiet retry is worth it.
+      if (!items.length) {
+        await new Promise((r) => setTimeout(r, 2500));
+        items = parseFeed(await fetchText(t.url, cookie));
+      }
       // Some official feeds return an empty shell if the session did not take.
       if (!items.length && t.fallback) {
         console.log(`  ..    ${t.name} returned nothing, trying fallback`);
@@ -497,8 +503,17 @@ async function main() {
         });
         kept++;
       }
-      sourceLog.push({ name: t.name, status: "ok", items: kept });
-      console.log(`  ok    ${t.name} - ${kept}`);
+      // PIB keeps the language against the session rather than the query
+      // string, so a feed can come back in Hindi whatever Lang says. The
+      // English keyword filter then drops everything, which looks like a dead
+      // source unless we say so plainly.
+      const devanagari = items.filter((i) => /[\u0900-\u097F]/.test(i.title)).length;
+      const note = devanagari > items.length / 2 ? " - feed came back in Hindi, session language did not take"
+                 : items.length !== kept ? ` (of ${items.length} fetched, rest filtered out)` : "";
+
+      sourceLog.push({ name: t.name, status: "ok", items: kept, fetched: items.length,
+                       hindi: devanagari > items.length / 2 || undefined });
+      console.log(`  ok    ${t.name} - ${kept}${note}`);
     } catch (err) {
       sourceLog.push({ name: t.name, status: "failed", error: String(err.message || err) });
       console.log(`  FAIL  ${t.name} - ${err.message || err}`);
