@@ -106,6 +106,32 @@ function canonCode(kind, num) {
   return `${kind.toUpperCase()}-${String(num).toUpperCase()}`;
 }
 
+// Words that appear in front of "Expressway" in a sentence but are not part of
+// any corridor's name. Without this the extractor invents corridors such as
+// "Largest Greenfield Expressway" or "Probes Fatal Expressway".
+const EXP_STOPWORDS = new Set(["the","this","that","a","an","of","on","at","in","to","from","and","for","with","its","their","our","his","her",
+  "new","old","first","second","third","next","last","latest","upcoming","proposed","planned","under","along","near","via","across","between",
+  "probes","fatal","crash","largest","biggest","longest","shortest","growth","progress","express","key","major","big","huge","mega","full","total","entire","whole",
+  "km","kms","kilometre","kilometres","kilometer","kilometers","crore","lakh","rs","access","controlled","six","eight","four","two","lane","laned","laning",
+  "india","indias","national","state","greenfield","brownfield","elevated","said","says","work","police","update","corridor"]);
+
+// "Lucknow-Kanpur" and "Kanpur-Lucknow" are the same road, so endpoint pairs are
+// ordered alphabetically before a code is made.
+function canonExpressway(name) {
+  let base = String(name).replace(/\s+Expressway$/i, "").trim();
+  let tokens = base.split(/\s+/);
+  while (tokens.length && EXP_STOPWORDS.has(tokens[0].toLowerCase())) tokens.shift();
+  while (tokens.length && EXP_STOPWORDS.has(tokens[tokens.length - 1].toLowerCase())) tokens.pop();
+  if (!tokens.length) return null;
+  base = tokens.join(" ");
+  const pair = base.split(/[-\u2013]/).map((x) => x.trim()).filter(Boolean);
+  if (pair.length === 2 && pair.every((x) => /^[A-Z][A-Za-z]+$/.test(x))) {
+    base = pair.slice().sort((a, b) => a.localeCompare(b)).join("-");
+  }
+  if (base.replace(/[^A-Za-z]/g, "").length < 4) return null;
+  return base + " Expressway";
+}
+
 function extractCorridors(text) {
   const found = new Map(); // code -> {code, kind, label}
 
@@ -127,22 +153,25 @@ function extractCorridors(text) {
     found.set(code, { code, kind, label: code });
   }
 
-  // Named expressways from the list
+  const addExpressway = (rawName) => {
+    const label = canonExpressway(rawName);
+    if (!label) return;
+    const code = "EXP:" + label.replace(/\s+/g, "-");
+    if (!found.has(code)) found.set(code, { code, kind: "EXP", label });
+  };
+
+  // Named corridors from the list
   const lower = text.toLowerCase();
   for (const name of NAMED_EXPRESSWAYS) {
-    if (lower.includes(name.toLowerCase())) {
-      const code = "EXP:" + name.replace(/\s+/g, "-");
-      found.set(code, { code, kind: "EXP", label: name });
-    }
+    if (!lower.includes(name.toLowerCase())) continue;
+    if (/expressway/i.test(name)) { addExpressway(name); continue; }
+    const code = "EXP:" + name.replace(/\s+/g, "-");
+    found.set(code, { code, kind: "EXP", label: name });
   }
 
   // Any other "<Something> Expressway" phrase
-  const reExp = /\b([A-Z][A-Za-z]+(?:[--][A-Z][A-Za-z]+)*(?:\s[A-Z][A-Za-z]+)?)\s+Expressway\b/g;
-  while ((m = reExp.exec(text)) !== null) {
-    const name = `${m[1]} Expressway`;
-    const code = "EXP:" + name.replace(/\s+/g, "-");
-    if (!found.has(code)) found.set(code, { code, kind: "EXP", label: name });
-  }
+  const reExp = /\b([A-Z][A-Za-z]+(?:[-\u2013][A-Z][A-Za-z]+)*(?:\s[A-Z][A-Za-z]+)?)\s+Expressway\b/g;
+  while ((m = reExp.exec(text)) !== null) addExpressway(m[1] + " Expressway");
 
   return [...found.values()].slice(0, 8);
 }
@@ -257,6 +286,19 @@ const isTransportRelevant = (i) =>
 /* Helpers                                                             */
 /* ================================================================== */
 
+// Remove the trailing publisher name, and the echoed headline, from a summary.
+function stripPublisher(summary, publisher, headline) {
+  let out = String(summary || "");
+  if (!out) return "";
+  for (const needle of [publisher, headline]) {
+    if (!needle) continue;
+    const esc = String(needle).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    out = out.replace(new RegExp("\\s*" + esc + "\\s*$", "i"), " ");
+    out = out.replace(new RegExp("^\\s*" + esc + "\\s*", "i"), " ");
+  }
+  return out.replace(/\s+/g, " ").trim();
+}
+
 function splitGoogleTitle(title) {
   const m = title.match(/^(.*)\s+-\s+([^-]{2,60})$/);
   return m ? { headline: m[1].trim(), publisher: m[2].trim() } : { headline: title, publisher: "" };
@@ -265,26 +307,133 @@ function splitGoogleTitle(title) {
 const normaliseKey = (t) =>
   lc(t).replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim().slice(0, 90);
 
+// Counting how many outlets carried a story only works if near-identical
+// headlines are recognised as the same event. Exact matching misses them:
+// "freight loading rises 5.4% to 137.9 MT" and "freight loading up 5.4% to
+// 137.9 million tonnes" are one story written two ways.
+const WORD_STOP = new Set(["the","and","for","with","from","that","this","into","over","after","says","said","will","have","has","been","its","are","was","were","than","then","also","amid","more","most","new","says","report","reports","india","indian","crore","lakh","per","cent","percent"]);
+
+function titleWords(title) {
+  return new Set(
+    lc(title).replace(/[^a-z0-9. ]/g, " ").split(/\s+/)
+      .filter((w) => w.length > 3 && !WORD_STOP.has(w))
+  );
+}
+
+function jaccard(a, b) {
+  if (!a.size || !b.size) return 0;
+  let inter = 0;
+  for (const x of a) if (b.has(x)) inter++;
+  return inter / (a.size + b.size - inter);
+}
+
+// Distinctive figures are the strongest clue that two headlines describe one
+// event: "137.9 MT", "17 bids", "Rs 8,300 crore". Years are excluded because
+// every story in a month carries the same one.
+function titleNumbers(title) {
+  const out = new Set();
+  for (const m of String(title).matchAll(/\d[\d,]*(?:\.\d+)?/g)) {
+    const raw = m[0].replace(/,/g, "");
+    const n = parseFloat(raw);
+    if (!isFinite(n)) continue;
+    if (Number.isInteger(n) && n >= 1900 && n <= 2100) continue;   // a year
+    if (!raw.includes(".") && raw.length < 2) continue;            // single digit
+    out.add(raw);
+  }
+  return out;
+}
+
+const SIMILARITY = 0.55;      // share most of their distinctive words, or
+const SIMILARITY_NUM = 0.3;   // share some words plus a distinctive figure
+const WINDOW_DAYS = 10;       // and appear within ten days of each other
+
+function sameEvent(a, b) {
+  const j = jaccard(a.words, b.words);
+  if (j >= SIMILARITY) return true;
+  if (j < SIMILARITY_NUM) return false;
+  for (const n of a.nums) if (b.nums.has(n)) return true;
+  return false;
+}
+
+// Group near-duplicate reports of the same event, keeping one representative
+// and counting the distinct outlets behind it.
+function clusterDuplicates(items) {
+  const clusters = [];
+  for (const item of items) {
+    const words = titleWords(item.title);
+    const nums = titleNumbers(item.title);
+    const when = new Date(item.published).getTime();
+    let placed = false;
+
+    for (const c of clusters) {
+      if (c.mode !== item.mode) continue;
+      if (Math.abs(when - c.when) > WINDOW_DAYS * 864e5) continue;
+      if (!sameEvent({ words, nums }, c)) continue;
+
+      (item.publishers || [item.publisher]).forEach((x) => { if (x) c.publishers.add(x); });
+      // Prefer a government release, otherwise the earliest report, which sits
+      // closest to the event itself.
+      if ((item.official && !c.rep.official) ||
+          (item.official === c.rep.official && when < c.when)) {
+        c.rep = item; c.when = when;
+      }
+      placed = true;
+      break;
+    }
+
+    if (!placed) {
+      clusters.push({
+        rep: item, words, nums, when, mode: item.mode,
+        publishers: new Set((item.publishers || [item.publisher]).filter(Boolean)),
+      });
+    }
+  }
+
+  return clusters.map((c) => ({
+    ...c.rep,
+    corroboration: Math.max(c.publishers.size, c.rep.corroboration || 1),
+    publishers: [...c.publishers].slice(0, 12),
+  }));
+}
+
 function toISO(d) {
   const x = new Date(d);
   return isNaN(x.getTime()) ? null : x.toISOString();
 }
 
-async function fetchText(url) {
+async function fetchText(url, cookie) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; Chainage/1.0)",
-        Accept: "application/rss+xml, application/xml, text/xml, */*",
-      },
-      redirect: "follow",
-    });
+    const headers = {
+      "User-Agent": "Mozilla/5.0 (compatible; Chainage/1.0)",
+      Accept: "application/rss+xml, application/xml, text/xml, */*",
+    };
+    if (cookie) headers.Cookie = cookie;
+    const res = await fetch(url, { signal: ctrl.signal, headers, redirect: "follow" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     return await res.text();
   } finally { clearTimeout(timer); }
+}
+
+// PIB stores the language and region choice server-side against a session, so
+// asking for Lang=1 on the RSS URL alone silently returns nothing. Visiting the
+// index page first sets the cookies that make the feed return English releases.
+async function warmSession(warmUrl) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(warmUrl, {
+      signal: ctrl.signal,
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Chainage/1.0)" },
+      redirect: "follow",
+    });
+    const jar = typeof res.headers.getSetCookie === "function"
+      ? res.headers.getSetCookie()
+      : [res.headers.get("set-cookie")].filter(Boolean);
+    return jar.map((c) => String(c).split(";")[0]).join("; ");
+  } catch { return ""; }
+  finally { clearTimeout(timer); }
 }
 
 /* ================================================================== */
@@ -314,7 +463,14 @@ async function main() {
 
   for (const t of targets) {
     try {
-      const items = parseFeed(await fetchText(t.url));
+      const cookie = t.warm ? await warmSession(t.warm) : "";
+      let xml = await fetchText(t.url, cookie);
+      let items = parseFeed(xml);
+      // Some official feeds return an empty shell if the session did not take.
+      if (!items.length && t.fallback) {
+        console.log(`  ..    ${t.name} returned nothing, trying fallback`);
+        items = parseFeed(await fetchText(t.fallback));
+      }
       let kept = 0;
       for (const raw of items) {
         if (t.gate && !isTransportRelevant(raw)) continue;
@@ -323,14 +479,21 @@ async function main() {
           : splitGoogleTitle(raw.title);
         const iso = toISO(raw.published);
         if (!iso || !raw.link) continue;
+        const pub = raw.feedSource || publisher || t.publisher || t.name;
+
+        // Google News appends the publisher to the description. Left in, an
+        // article from "Punjab Kesari" about Maharashtra gets tagged Punjab and
+        // "Telangana Today" tags every story Telangana. Strip it before tagging.
+        const cleanSummary = stripPublisher(raw.summary, pub, headline);
+
         fresh.push({
           title: headline,
           url: raw.link,
-          publisher: raw.feedSource || publisher || t.publisher || t.name,
+          publisher: pub,
           official: !!t.official,
           published: iso,
-          summary: raw.summary && raw.summary !== raw.title ? raw.summary.slice(0, 320) : "",
-          ...classify(headline, raw.summary),
+          summary: cleanSummary.slice(0, 320),
+          ...classify(headline, cleanSummary),
         });
         kept++;
       }
@@ -358,11 +521,16 @@ async function main() {
   }
 
   const cutoff = Date.now() - RETAIN_DAYS * 864e5;
-  const items = [...byKey.values()]
+  const deduped = [...byKey.values()]
     .filter((i) => new Date(i.published).getTime() >= cutoff)
+    .sort((a, b) => new Date(b.published) - new Date(a.published));
+
+  const before = deduped.length;
+  const items = clusterDuplicates(deduped)
     .sort((a, b) => new Date(b.published) - new Date(a.published))
     .slice(0, MAX_ITEMS)
     .map((i, idx) => ({ ...i, id: "c" + idx + "-" + normaliseKey(i.title).slice(0, 20).replace(/ /g, "_") }));
+  console.log(`Grouped ${before} reports into ${items.length} events.`);
 
   // Corridor index, one entry per corridor seen, for the picker.
   const corridorMap = new Map();
