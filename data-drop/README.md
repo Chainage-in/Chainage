@@ -3,8 +3,8 @@
 Put CSV files here and they become charts on the Timeline tab, with download
 buttons for CSV and Excel.
 
-This folder exists because most of the sources you want do not publish anything
-a machine can read on a schedule. VAHAN has no public API and blocks automated
+This folder exists because most useful sources do not publish anything a machine
+can read on a schedule. VAHAN has no public API and blocks automated
 access. MoSPI and the Office of the Economic Adviser publish spreadsheets and
 press releases, not feeds. IHMCL publishes plaza level data as monthly PDFs.
 Rather than ship scrapers that break silently, the tool reads whatever you put
@@ -32,17 +32,16 @@ you like, one per source is tidiest.
 
 ## Where to get each thing
 
-**Toll plaza traffic and revenue.** IHMCL publishes a VC Wise Monthly ETC FASTag
+**Plaza level volumes and collections.** IHMCL publishes a VC Wise Monthly ETC FASTag
 Report at ihmcl.co.in/etc-transaction-reports as a PDF for each month, broken
 down by plaza and vehicle class. The Timeline tab lists and links every one of
-these automatically. Open the month you need, copy the rows for your plazas into
-a CSV here with `plaza` and `corridor` filled in.
+these automatically. Open the month you need and copy the rows you want into a
+CSV here, filling in `plaza` and `corridor`.
 
-Read IHMCL's own disclaimer before you use any of it. They state the data is
-subject to post settlement adjustment and reconciliation, that they make no
-warranty as to accuracy or finality, and that it should not be relied on for
-bidding or commercial decision making. Treat it as indicative and verify against
-concessionaire or authority records.
+Read the publisher's own disclaimer before using any of it. They state the
+figures are subject to later adjustment and reconciliation, make no warranty as
+to accuracy or finality, and advise against relying on them for any commercial
+decision. Treat them as indicative and check against the operator or authority.
 
 **GDP and GSDP.** MoSPI publishes National Accounts and state series at
 mospi.gov.in. Download the relevant table, keep the year and value columns, and
@@ -54,14 +53,13 @@ month and export. There is no public API, so this one is always a manual export.
 
 **WPI.** The Office of the Economic Adviser publishes the monthly index at
 eaindustry.nic.in, including commodity level detail. Useful series: all
-commodities, fuel and power, and the specific commodities that move on your
-corridor such as cement, steel and coal.
+commodities, fuel and power, and individual commodities such as cement, steel
+and coal.
 
 **Global forecasts.** Consensus Economics and S&P Global Market Intelligence,
-formerly IHS Markit, are paid subscriptions. There is no free or automated route
-to them. If your organisation subscribes, export and drop the numbers here. If
-not, the IMF World Economic Outlook and World Bank open data are free
-alternatives that publish downloadable series.
+formerly IHS Markit, are paid subscriptions with no free or automated route. The
+IMF World Economic Outlook and World Bank open data are free alternatives that
+publish downloadable series.
 
 ## Template
 
