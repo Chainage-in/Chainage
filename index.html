@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Chainage. India Transport Corridor Monitor | NH, SH, AH and Expressway News</title>
-<meta name="description" content="Track what has affected traffic on any Indian highway corridor. Road, rail, air and port news from government releases and multiple news sources, organised by NH, SH, AH and expressway, with a clipping log and downloadable data." />
+<meta name="description" content="Track what has affected traffic on any Indian highway corridor. Road, rail, air and port news from government releases and multiple news sources, organised by NH, SH, AH and expressway, with a saved-items list and downloadable data." />
 <meta name="keywords" content="India transport news, highway news India, NHAI news, toll plaza news, expressway news, national highway traffic, transport corridor monitor" />
 <link rel="canonical" href="./" />
 <meta property="og:type" content="website" />
@@ -190,7 +190,7 @@ button.tag:hover{border-color:var(--blue);color:var(--blue)}
 .divb b{font-family:inherit;font-variant-numeric:tabular-nums;font-weight:600;color:var(--blue-dk)}
 .divb span{color:var(--tx-faint);font-size:.72rem;margin-left:6px}
 
-/* ---------- clipping panel ---------- */
+/* ---------- saved items panel ---------- */
 .panel{background:var(--box);border:1px solid var(--bd);position:sticky;top:10px}
 .panel-head{background:var(--blue);color:#fff;padding:7px 13px}
 .panel-title{font-size:.86rem;font-weight:600;margin:0}
@@ -204,7 +204,7 @@ button.tag:hover{border-color:var(--blue);color:var(--blue)}
   color:var(--blue-dk);margin-top:5px}
 .clip-x{position:absolute;top:6px;right:8px;background:none;border:0;color:var(--tx-faint);font-size:1.05rem;line-height:1;padding:2px 5px}
 .clip-x:hover{color:var(--maroon)}
-.panel-foot{padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap;background:var(--zebra)}
+.panel-foot{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap;background:var(--zebra)}
 .btn{border:1px solid var(--blue);background:var(--blue);color:#fff;padding:5px 12px;font-size:.8rem;font-weight:600}
 .btn:hover{background:var(--blue-dk)}
 .btn.ghost{background:#fff;color:var(--blue)}
@@ -356,8 +356,6 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       <div class="board" id="board" role="group" aria-label="Filter by mode"></div>
     </div>
 
-    <div id="dashHost"></div>
-
     <div class="box">
       <div class="box-h">Search and Filters</div>
       <div class="box-b">
@@ -378,29 +376,6 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       </div>
     </div>
 
-    <div class="box">
-      <div class="box-h">Events On Record
-        <span class="sub">Curated chronology of what has moved traffic. Verify before citing</span></div>
-      <div class="box-b">
-        <div class="cpick">
-          <input class="search" id="mq" type="search" placeholder="Search events: toll, lockdown, mining, cyclone, crude..." aria-label="Search events" />
-          <select class="pick" id="mkind" aria-label="Event type">
-            <option value="">All Types</option>
-            <option value="macro">Economic</option>
-            <option value="policy">Policy</option>
-            <option value="environment">Environmental</option>
-            <option value="social">Social</option>
-            <option value="geopolitical">Geopolitical</option>
-            <option value="sector">Infrastructure</option>
-          </select>
-          <select class="pick" id="mmode" aria-label="Mode affected">
-            <option value="">All Modes</option><option value="road">Road</option>
-            <option value="rail">Rail</option><option value="air">Air</option><option value="port">Ports</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div id="macroBody"></div>
   </section>
 
   <!-- ============ CORRIDOR VIEW ============ -->
@@ -432,34 +407,63 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     <aside>
       <div class="panel">
         <div class="panel-head">
-          <h2 class="panel-title">Clipping Log</h2>
-          <p class="panel-sub" id="panelSub">Clip an item to log it as evidence against a corridor or project. Saved in this browser.</p>
+          <h2 class="panel-title">Saved Items</h2>
+          <p class="panel-sub" id="panelSub">Press Save on any item to keep it here with your own note. Stored in this browser only.</p>
+        </div>
+        <div class="panel-foot">
+          <button class="btn" id="exportBtn" disabled>Download CSV</button>
+          <button class="btn" id="exportXlsBtn" disabled>Download Excel</button>
+          <button class="btn ghost" id="clearBtn" disabled>Clear all</button>
         </div>
         <ul class="clips" id="clips"></ul>
-        <div class="panel-foot">
-          <button class="btn" id="exportBtn" disabled>Export CSV</button>
-          <button class="btn ghost" id="clearBtn" disabled>Clear Log</button>
-        </div>
       </div>
     </aside>
   </div>
 </div>
+
+
+    <div id="dashHost"></div>
+  <div id="eventsBlock">
+    <div class="box">
+      <div class="box-h">Events On Record
+        <span class="sub">Curated chronology of what has moved traffic. Verify before citing</span></div>
+      <div class="box-b">
+        <div class="cpick">
+          <input class="search" id="mq" type="search" placeholder="Search events: toll, lockdown, mining, cyclone, crude..." aria-label="Search events" />
+          <select class="pick" id="mkind" aria-label="Event type">
+            <option value="">All Types</option>
+            <option value="macro">Economic</option>
+            <option value="policy">Policy</option>
+            <option value="environment">Environmental</option>
+            <option value="social">Social</option>
+            <option value="geopolitical">Geopolitical</option>
+            <option value="sector">Infrastructure</option>
+          </select>
+          <select class="pick" id="mmode" aria-label="Mode affected">
+            <option value="">All Modes</option><option value="road">Road</option>
+            <option value="rail">Rail</option><option value="air">Air</option><option value="port">Ports</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="macroBody"></div>
+  </div>
+
 
 <footer class="foot" id="footer">
   <div class="wrap foot-in">
     <div class="foot-upd">Last updated on: <b id="footUpdated">not yet</b> &nbsp;|&nbsp; Collected three times daily</div>
     <b>Disclaimer.</b> Chainage collects headlines from government press releases and multiple news outlets.
     Links and text belong to their publishers, so open the source before citing anything in a study.<br>
-    Corridor tagging, claimed status and signal are worked out from wording and are a starting point, not a finding.
-    Verify at package or section level before relying on any of it.<br>
-    Clippings are stored only in this browser and are not backed up. Export to CSV to keep them.<br>
+    Corridor, status and signal tags are worked out from wording alone. Treat them as a starting point and check
+    the source before relying on any of them.<br>
+    Saved items are stored only in this browser and are not backed up. Download them to keep them.<br>
     <br>
     Chainage is an independent research project. It is not a Government of India website and is not
     affiliated with any ministry, authority, department or company.
   </div>
 </footer>
 
-<datalist id="projectList"></datalist>
 
 <script>
 
@@ -493,7 +497,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
                other:{label:"Other",color:"#6B6B66"} };
   var KIND = { NH:"National highway", SH:"State highway", AH:"Asian highway",
                MDR:"Major district road", EXP:"Expressway" };
-  var IMPACTS = ["Not assessed","Traffic up","Traffic down","Revenue up","Revenue down","No impact","Watch"];
+  var IMPACTS = ["Not assessed","Increases movement","Reduces movement","Raises cost","Lowers cost","No effect","Watch"];
   var STORE = "chainage.clips.v1";
 
   var data = { items: [], categories: [], signals: [], maturities: [], corridors: [], sources: [] };
@@ -643,8 +647,9 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     $("cq").addEventListener("input", function(){ clearTimeout(ct); ct=setTimeout(renderCorridor,140); });
     $("ckind").addEventListener("change", renderCorridor);
     $("exportBtn").addEventListener("click", exportCsv);
+    $("exportXlsBtn").addEventListener("click", exportClipsXlsx);
     $("clearBtn").addEventListener("click", function(){
-      if(confirm("Delete all clippings from this browser? Export first if you need them.")){ clips={}; save(); render(); } });
+      if(confirm("Delete everything saved in this browser? Download first if you need it.")){ clips={}; save(); render(); } });
     addEventListener("popstate", function(){
       corridor = new URLSearchParams(location.search).get("corridor");
       switchTo(corridor ? "corridor" : view);
@@ -662,6 +667,10 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     $("tabCorridor").setAttribute("aria-selected", String(v==="corridor"));
     $("viewFeed").classList.toggle("hide", v!=="feed");
     $("viewCorridor").classList.toggle("hide", v!=="corridor");
+    $("eventsBlock").classList.toggle("hide", v!=="feed");
+    $("dashHost").classList.toggle("hide", v!=="feed");
+    $("eventsBlock").classList.toggle("hide", v!=="feed");
+    $("dashHost").classList.toggle("hide", v!=="feed");
     if (v==="feed"){
       setUrl(null);
       $("corridorBody").innerHTML=""; $("corridorDash").innerHTML="";
@@ -731,23 +740,54 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
           '<span class="pub">'+esc(i.publisher||"Unattributed")+'</span><span>·</span><span>'+fmtDate(i.published)+'</span></div>' +
         (i.summary?'<p class="snip">'+esc(i.summary)+'</p>':'') +
         (tags?'<div class="tags">'+tags+'</div>':'') +
-        '<div class="row-actions"><button class="act clipBtn'+(clipped?" on":"")+'">'+(clipped?"Clipped":"Clip")+'</button>' +
-          (clipped?'<button class="act editBtn">Edit note</button>':'')+'</div>' +
+        '<div class="row-actions"><button class="act clipBtn'+(clipped?" on":"")+'">'+(clipped?"Saved":"Save")+'</button>' +
+          (clipped?'<button class="act editBtn">Add note</button>':'')+'</div>' +
         (clipped && openEditor===i.id ? editorHtml(i) : "") +
       '</div></li>';
   }
 
+  // Options for the corridor picker: the ones found on this item first, then
+  // everything on record, then anything typed earlier.
+  function corridorOptions(i, chosen){
+    var own = (i.corridors||[]).map(function(c){ return c.label; });
+    var all = (data.corridors||[]).map(function(c){ return c.label; });
+    var mine = Object.keys(clips).map(function(k){ return clips[k].project; }).filter(Boolean);
+    var seen = {}, html = "";
+
+    function group(label, list){
+      var rows = "";
+      list.forEach(function(v){
+        if(!v || seen[v]) return;
+        seen[v] = 1;
+        rows += '<option'+(chosen===v?" selected":"")+' value="'+esc(v)+'">'+esc(v)+'</option>';
+      });
+      if(rows) html += '<optgroup label="'+label+'">'+rows+'</optgroup>';
+    }
+
+    html += '<option value=""'+(chosen?"":" selected")+'>Not assigned</option>';
+    group("On this item", own);
+    group("Used before", mine);
+    group("All on record", all.slice(0, 400));
+    if(chosen && !seen[chosen]) {
+      html += '<optgroup label="Yours"><option selected value="'+esc(chosen)+'">'+esc(chosen)+'</option></optgroup>';
+    }
+    html += '<option value="__other__">Something else, type it</option>';
+    return html;
+  }
+
   function editorHtml(i){
     var c = clips[i.id]||{};
-    var suggested = c.project || ((i.corridors||[])[0]||{}).label || "";
+    var chosen = c.project || ((i.corridors||[])[0]||{}).label || "";
     return '<div class="editor"><div class="pair">' +
-      '<div><label for="p_'+i.id+'">Project or corridor</label>' +
-      '<input id="p_'+i.id+'" class="fProject" list="projectList" value="'+esc(suggested)+'" placeholder="e.g. TOT-21 · NH-27 Gorhi"></div>' +
+      '<div><label for="p_'+i.id+'">Corridor</label>' +
+      '<select id="p_'+i.id+'" class="fProject">'+corridorOptions(i, chosen)+'</select>' +
+      '<input class="fOther hide" placeholder="Type a name" value="">' +
+      '</div>' +
       '<div><label for="i_'+i.id+'">Assessed impact</label><select id="i_'+i.id+'" class="fImpact">' +
       IMPACTS.map(function(x){ return '<option'+(c.impact===x?" selected":"")+'>'+x+'</option>'; }).join("")+'</select></div></div>' +
-      '<div><label for="n_'+i.id+'">Why this matters</label>' +
-      '<textarea id="n_'+i.id+'" class="fNote" placeholder="Reason it affects traffic or revenue, and which forecast year it hits.">'+esc(c.note||"")+'</textarea></div>' +
-      '<div><button class="act saveBtn">Save clipping</button></div></div>';
+      '<div><label for="n_'+i.id+'">Your note</label>' +
+      '<textarea id="n_'+i.id+'" class="fNote" placeholder="What this changes, and when.">'+esc(c.note||"")+'</textarea></div>' +
+      '<div><button class="act saveBtn">Save</button></div></div>';
   }
 
   function bindRows(){
@@ -777,10 +817,20 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
         if(openEditor){ var el=$("p_"+openEditor); if(el) el.focus(); }
       });
     });
+    root.querySelectorAll(".fProject").forEach(function(sel){
+      sel.addEventListener("change", function(){
+        var other = sel.closest("div").querySelector(".fOther");
+        if(!other) return;
+        var custom = sel.value === "__other__";
+        other.classList.toggle("hide", !custom);
+        if(custom) other.focus();
+      });
+    });
     root.querySelectorAll(".saveBtn").forEach(function(b){
       b.addEventListener("click", function(){
         var li=b.closest(".item"), id=li.dataset.id, c=clips[id]; if(!c) return;
-        c.project=li.querySelector(".fProject").value.trim();
+        var sel=li.querySelector(".fProject"), other=li.querySelector(".fOther");
+        c.project = sel.value === "__other__" ? (other ? other.value.trim() : "") : sel.value;
         c.impact=li.querySelector(".fImpact").value;
         c.note=li.querySelector(".fNote").value.trim();
         openEditor=null; save(); repaint();
@@ -821,7 +871,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     }
 
     var html = '<div class="sec"><div class="sec-h"><h3 class="sec-t">' + list.length +
-      ' Events</h3><p class="sec-d">Newest first. A green tick means the date has been checked against a source.</p></div>' +
+      ' Events</h3><p class="sec-d">Newest first. A green DATE CHECKED label means the date has been verified against a source.</p></div>' +
       '<div style="border:1px solid var(--bd);border-top:0;background:var(--box);padding:10px">';
 
     html += list.map(function(e){
@@ -876,7 +926,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
                    .sort(function(a,b){ return (a.targetYear||9999)-(b.targetYear||9999) || new Date(b.published)-new Date(a.published); });
 
     var html =
-      '<div class="marker"><div class="marker-cap" style="background:'+(MODE[list[0].mode]||MODE.road).color+'"></div>' +
+      '<div class="marker" style="border-top-color:'+(MODE[list[0].mode]||MODE.road).color+'">' +
       '<div class="marker-in"><div><h2 class="marker-code">'+esc(meta.label)+'</h2>' +
       '<p class="marker-st">'+esc(KIND[meta.kind]||"Corridor")+
       (meta.states&&meta.states.length?' · '+esc(meta.states.join(", ")):'')+'</p></div>' +
@@ -884,12 +934,12 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       '<b>'+past.length+'</b> past events · <b>'+fwd.length+'</b> ahead<br>' +
       'earliest '+fmtDate(list[list.length-1].published)+'</div></div></div>';
 
-    html += section("What has happened", "Events already on the ground. Newest first, grouped by year.",
+    html += section("What has happened", "Already on the ground. Newest first, grouped by year.",
                     past, true);
     html += section("What is coming", "Announced, sanctioned, awarded or under construction. Sorted by stated target year, these are claims from the source, not commitments.",
                     fwd, false);
     html += backgroundHtml(corridor);
-    html += diversionHtml(list);
+    html += nearbyHtml(list);
 
     $("corridorBody").innerHTML = html;
     bindRows();
@@ -940,7 +990,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     return out + '</div></div>';
   }
 
-  function diversionHtml(list){
+  function nearbyHtml(list){
     // Corridors that keep appearing alongside this one, in the same states.
     var states = {};
     list.forEach(function(i){ (i.regions||[]).forEach(function(r){ states[r]=1; }); });
@@ -957,7 +1007,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       .sort(function(a,b){ return b.n-a.n; }).slice(0,10);
 
     var out = '<div class="sec"><div class="sec-h"><h3 class="sec-t">Corridors nearby</h3>' +
-      '<p class="sec-d">Other corridors showing up in the same states. Some will compete for this traffic and some will feed it. Check each one before treating it as diversion risk.</p></div>';
+      '<p class="sec-d">Other corridors appearing in the same states. Some carry the same movement, others feed into it. Open each one to see.</p></div>';
     if(!top.length) return out + '<p class="sec-d">No other corridors on record in these states yet.</p></div>';
     out += '<div class="divs">' + top.map(function(c){
       return '<button class="divb" data-corridor="'+esc(c.code)+'"><b>'+esc(c.label)+'</b><span>'+c.n+'</span></button>';
@@ -983,8 +1033,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     $("corridorBody").innerHTML =
       '<p class="count" style="padding-top:16px">'+list.length+' corridors on record · newest activity first within each</p>' +
       '<ul class="clist">' + list.slice(0,400).map(function(c){
-        return '<li><button class="ccard" data-corridor="'+esc(c.code)+'">' +
-          '<div class="ccard-cap" style="background:'+(colorFor[c.kind]||"#6B6B66")+'"></div>' +
+        return '<li><button class="ccard" data-corridor="'+esc(c.code)+'" style="--bar:'+(colorFor[c.kind]||"#6B6B66")+'">' +
           '<div class="ccard-in"><span class="ccard-code">'+esc(c.label)+'</span>' +
           '<span class="ccard-st">'+esc((c.states||[]).slice(0,3).join(", ")||KIND[c.kind]||"")+'</span>' +
           '<span class="ccard-n">'+c.count+' item'+(c.count===1?"":"s")+' · to '+fmtDate(c.last)+'</span>' +
@@ -1154,8 +1203,21 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
   /* Minimal XLSX writer. An xlsx file is a ZIP of XML parts; storing the
      parts uncompressed keeps this to a few dozen lines and produces a file
      Excel opens without complaint. No external library needed. */
-  function exportDashXlsx(){
-    var t=exportRows();
+  function exportDashXlsx(){ writeXlsx(exportRows(), "chainage-data"); }
+
+  // Saved items, as a real Excel file rather than a renamed CSV.
+  function exportClipsXlsx(){
+    var cols=["Saved on","Corridor","Assessed impact","Your note","Headline","Publisher",
+              "Sources carrying it","Published","Status claimed","Signal","Target year","Mode","Categories","States","Corridors","URL"];
+    var body=Object.keys(clips).sort(function(a,b){ return new Date(clips[b].clippedAt)-new Date(clips[a].clippedAt); })
+      .map(function(k){ var c=clips[k];
+        return [c.clippedAt?c.clippedAt.slice(0,10):"", c.project||"", c.impact||"", c.note||"", c.title||"",
+                c.publisher||"", c.corroboration||1, c.published?c.published.slice(0,10):"", c.maturity||"",
+                c.signal||"", c.targetYear||"", c.mode||"", c.categories||"", c.regions||"", c.corridorCodes||"", c.url||""]; });
+    writeXlsx({ head:cols, body:body }, "chainage-saved-items");
+  }
+
+  function writeXlsx(t, basename){
     var enc=new TextEncoder();
 
     function xesc(s){ return String(s==null?"":s)
@@ -1179,7 +1241,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     var parts=[
       ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
       ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
-      ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Chainage data" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+      ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Data" sheetId="1" r:id="rId1"/></sheets></workbook>'],
       ["xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
       ["xl/worksheets/sheet1.xml",sheet]
     ];
@@ -1217,7 +1279,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
 
     download(new Blob(chunks.concat(cdir),
       {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
-      "chainage-data-"+new Date().toISOString().slice(0,10)+".xlsx");
+      basename+"-"+new Date().toISOString().slice(0,10)+".xlsx");
   }
 
   /* ---------------- dashboard render ---------------- */
@@ -1316,35 +1378,34 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     var byYear={};
     ind.reports.forEach(function(r){ (byYear[r.year||"Undated"]=byYear[r.year||"Undated"]||[]).push(r); });
     var years=Object.keys(byYear).sort(function(a,b){ return String(b).localeCompare(String(a)); }).slice(0,4);
-    return '<div class="box"><div class="box-h">Plaza Level Source Reports'+
-      '<span class="sub">Published monthly, plaza and vehicle class wise</span></div><div class="box-b">'+
+    return '<div class="box"><div class="box-h">Source Reports'+
+      '<span class="sub">Published monthly by the operator</span></div><div class="box-b">'+
       years.map(function(y){
         return '<div class="rep-y"><span class="rep-yl">'+esc(y)+'</span>'+
           byYear[y].map(function(r){
             return '<a class="rep" href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+
               esc(r.month||r.label)+' <small>'+esc(r.kind)+' '+esc(r.format)+'</small></a>'; }).join("")+
           '</div>'; }).join("")+
-      '<p class="dash-src">The publisher states this data is subject to post settlement adjustment and ' +
-      'reconciliation, gives no warranty as to accuracy or finality, and advises it should not be relied ' +
-      'on for bidding or commercial decisions. Verify against authority or concessionaire records before use.</p>'+
+      '<p class="dash-src">The publisher states these figures are subject to later adjustment and ' +
+      'reconciliation, gives no warranty as to their accuracy or finality, and advises against relying on ' +
+      'them for any commercial decision. Check them against the operator before use.</p>'+
       '</div></div>';
   }
 
-  /* ---------------- clipping log ---------------- */
+  /* ---------------- saved list ---------------- */
 
   function renderClips(){
     var keys = Object.keys(clips).sort(function(a,b){ return new Date(clips[b].clippedAt)-new Date(clips[a].clippedAt); });
     $("exportBtn").disabled = !keys.length;
+    $("exportXlsBtn").disabled = !keys.length;
     $("clearBtn").disabled = !keys.length;
     $("panelSub").textContent = keys.length
-      ? keys.length + (keys.length===1?" clipping":" clippings") + " saved in this browser."
-      : "Clip an item to log it as evidence against a corridor or project. Saved in this browser.";
-    var seen={}; keys.forEach(function(k){ if(clips[k].project) seen[clips[k].project]=1; });
-    $("projectList").innerHTML = Object.keys(seen).map(function(p){ return '<option value="'+esc(p)+'">'; }).join("");
+      ? keys.length + (keys.length===1?" saved item":" saved items") + " saved in this browser."
+      : "Press Save on any item to keep it here with your own note. Stored in this browser only.";
     if(!keys.length){ $("clips").innerHTML=""; return; }
     $("clips").innerHTML = keys.map(function(k){
       var c = clips[k];
-      return '<li class="clip"><button class="clip-x" data-id="'+esc(k)+'" aria-label="Remove clipping">&times;</button>' +
+      return '<li class="clip"><button class="clip-x" data-id="'+esc(k)+'" aria-label="Remove saved item">&times;</button>' +
         '<p class="clip-t">'+esc(c.title)+'</p>' +
         '<div class="clip-m">'+esc(c.project||c.corridorCodes||c.mode)+' · '+fmtDate(c.published)+'</div>' +
         (c.impact&&c.impact!=="Not assessed"?'<span class="clip-imp">'+esc(c.impact)+'</span>':'') + '</li>';
@@ -1366,7 +1427,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     var csv = "\ufeff" + cols.map(q).join(",") + "\r\n" + rows.join("\r\n");
     var url = URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
     var a = document.createElement("a");
-    a.href=url; a.download="chainage-clippings-"+new Date().toISOString().slice(0,10)+".csv";
+    a.href=url; a.download="chainage-saved items-"+new Date().toISOString().slice(0,10)+".csv";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); },1000);
   }
