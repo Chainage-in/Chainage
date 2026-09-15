@@ -97,16 +97,16 @@ The dark bar at the top carries the controls Indian government sites conventiona
 Both remember your choice on that browser. There is also a skip-to-content link for keyboard
 and screen-reader users.
 
-### Clipping
-Clip any item to log it as evidence. The project field pre-fills with the corridor. Add your
-impact assessment and a note on why it matters and which forecast year it hits.
+### Saving items
+Press Save on any item to keep it with your own note. The corridor field pre-fills where one was detected. Add your
+assessment and a note on what it changes and when.
 
-**Export CSV** gives you: your note and impact, the headline, publisher, how many sources carried
-it, publication date, claimed status, signal, target year, mode, states, corridors, and the URL.
-Ready for a study annexure.
+**Download CSV** or **Download Excel** gives you: your note and assessment, the headline,
+publisher, how many sources carried it, publication date, claimed status, signal, target year,
+mode, states, corridors, and the URL.
+Ready to paste into a report.
 
-Clippings live in the browser you made them in. They are not synced and not backed up. Export what you want
-to keep.
+Saved items live in the browser you made them in. They are not synced and not backed up. Download what you want to keep.
 
 ---
 
@@ -165,8 +165,7 @@ A green **DATE CHECKED** badge means the date was verified against a source; the
 starting points. None of it is a citation, so chase the primary source before it goes in a study.
 
 The file is `history/macro-events.json`. Add your own rows in the same shape: date, title, kind,
-mechanism, modes, regions. Your institutional knowledge belongs here, and it is worth more than
-anything scraped.
+mechanism, modes, regions. What you know that the sources do not belongs here.
 
 **2. Corridor Background (Wikipedia).** For each corridor on record, a dated chronology pulled
 from its Wikipedia article: when it was renumbered, four-laned, bypassed, opened. It appears as a
@@ -200,8 +199,7 @@ not years. A corridor page will look thin at first and fill out over months as t
 The collector keeps everything it has ever collected, so the record compounds, but it cannot
 reconstruct 2019-2025 for you.
 
-For a study needing older history, use Chainage for everything from today forward, and keep
-searching archives manually for the back years.
+For older history, use Chainage from today forward and search the archives by hand for the back years.
 
 ---
 
