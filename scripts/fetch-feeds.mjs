@@ -177,6 +177,63 @@ function extractCorridors(text) {
 }
 
 /* ================================================================== */
+/* PIB All Releases page                                               */
+/* ================================================================== */
+
+// PIB's RSS is governed by server-side session state and comes back in Hindi
+// whatever the query string says. The All Releases page does honour reg and
+// lang, and it groups releases under the issuing ministry, which the feed
+// never gave us. So we read that page instead.
+
+// Everything these ministries issue is in scope, whatever the headline says.
+const PIB_CORE_MINISTRIES = [
+  "Road Transport", "Surface Transport", "Railways", "Ports, Shipping", "Shipping",
+  "Waterways", "Civil Aviation",
+  "Cabinet Committee on Infrastructure", "Cabinet Committee on Economic Affairs",
+];
+
+// Other ministries publish plenty that matters, but also a lot that does not,
+// so their releases still have to clear the keyword test below.
+const pibCoreMinistry = (m) =>
+  PIB_CORE_MINISTRIES.some((x) => lc(m || "").includes(lc(x)));
+
+function parsePibAllRel(html) {
+  const out = [];
+  let ministry = "";
+
+  // Walk headings and release links in document order so each release
+  // inherits the ministry heading that sits above it.
+  const re = /<h[2-5][^>]*>([\s\S]*?)<\/h[2-5]>|<a[^>]+href="([^"]*PressRelease[^"]*PRID=\d+[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[1] !== undefined) {
+      const h = stripTags(m[1]);
+      if (h && h.length < 90) ministry = h;
+      continue;
+    }
+    const url = decodeEntities(m[2]).replace(/&amp;/g, "&");
+    const title = stripTags(m[3]);
+    if (!title || title.length < 15) continue;
+    out.push({
+      title,
+      link: url.startsWith("http") ? url : "https://www.pib.gov.in/" + url.replace(/^\/+/, ""),
+      ministry,
+      published: new Date().toUTCString(),
+      summary: "",
+    });
+  }
+
+  // The same release can be linked more than once on the page.
+  const seen = new Set();
+  return out.filter((i) => {
+    const key = (i.link.match(/PRID=(\d+)/) || [])[1] || i.title;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/* ================================================================== */
 /* Classification                                                      */
 /* ================================================================== */
 
@@ -220,7 +277,10 @@ const MATURITY = [
 
 const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Jammu","Kashmir","Ladakh","Puducherry","Chandigarh","Andaman"];
 
-const TRANSPORT_GATE = ["highway","road","toll","nhai","morth","expressway","railway","rail","train","airport","aviation","airline","port","shipping","cargo","logistics","freight","transport","metro","bridge","corridor","waterway","vehicle","traffic","fastag","gati shakti"];
+const TRANSPORT_GATE = ["highway","road","toll","nhai","morth","expressway","railway","rail","train","airport","aviation","airline","port","shipping","cargo","logistics","freight","transport","metro","bridge","corridor","waterway","vehicle","traffic","fastag","gati shakti",
+  // demand-side indicators: no transport word in the headline, but these are
+  // what a traffic forecast is anchored against
+  "wholesale price index","consumer price index","index of industrial production","gross domestic product","gdp","e-way bill","gst collection","core sector","iip","mining production","coal production","steel production","cement production"];
 
 const lc = (s) => String(s || "").toLowerCase();
 const hits = (text, terms) => terms.reduce((n, t) => n + (text.includes(t) ? 1 : 0), 0);
@@ -464,13 +524,17 @@ async function main() {
   for (const t of targets) {
     try {
       const cookie = t.warm ? await warmSession(t.warm) : "";
-      let items = parseFeed(await fetchText(t.url, cookie));
+      let items = t.type === "pib-allrel"
+        ? parsePibAllRel(await fetchText(t.url))
+        : parseFeed(await fetchText(t.url, cookie));
 
       // Publishers rate-limit intermittently and answer with an empty feed
       // rather than an error, so one quiet retry is worth it.
       if (!items.length) {
         await new Promise((r) => setTimeout(r, 2500));
-        items = parseFeed(await fetchText(t.url, cookie));
+        items = t.type === "pib-allrel"
+          ? parsePibAllRel(await fetchText(t.url))
+          : parseFeed(await fetchText(t.url, cookie));
       }
       // Some official feeds return an empty shell if the session did not take.
       if (!items.length && t.fallback) {
@@ -479,7 +543,8 @@ async function main() {
       }
       let kept = 0;
       for (const raw of items) {
-        if (t.gate && !isTransportRelevant(raw)) continue;
+        const byMinistry = pibCoreMinistry(raw.ministry);
+        if (t.gate && !byMinistry && !isTransportRelevant(raw)) continue;
         const { headline, publisher } = t.official
           ? { headline: raw.title, publisher: t.publisher }
           : splitGoogleTitle(raw.title);
@@ -499,7 +564,8 @@ async function main() {
           official: !!t.official,
           published: iso,
           summary: cleanSummary.slice(0, 320),
-          ...classify(headline, cleanSummary),
+          ministry: raw.ministry || undefined,
+          ...classify(headline, cleanSummary + " " + (raw.ministry || "")),
         });
         kept++;
       }
