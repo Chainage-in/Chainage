@@ -1,11 +1,11 @@
 {
-  "_about": "Curated reference timeline of events that moved traffic, freight or transport revenue in India. This is a starting chronology for justification narratives, NOT a citation. Every entry must be verified against a primary source before it goes into a study. Edit freely, add your own rows in the same shape.",
+  "_about": "Curated reference timeline of events that changed how people and goods moved across India. A starting chronology, not a citation. Verify every entry against a primary source before relying on it. Edit freely and add your own rows in the same shape.",
   "_fields": {
     "date": "YYYY-MM-DD, or YYYY-MM where only the month is meaningful",
     "end": "optional end date for events with duration",
     "title": "short name of the event",
     "kind": "macro | policy | environment | social | geopolitical | sector",
-    "mechanism": "how it reached transport, the bit you actually need for a narrative",
+    "mechanism": "how the event reached the transport system",
     "modes": "road | rail | air | port",
     "regions": "states affected, empty means all-India",
     "verified": "true only where the date has been checked against a source",
@@ -42,7 +42,7 @@
       "modes": ["road"], "regions": [] },
 
     { "date": "2015-12", "title": "Chennai floods", "kind": "environment",
-      "mechanism": "Highways and rail into Chennai cut for days; airport closed; port operations disrupted. A sharp one-month dip in regional traffic series.",
+      "mechanism": "Highways and rail into Chennai cut for days, airport closed, port operations disrupted. A sharp one-month regional dip.",
       "modes": ["road","rail","air","port"], "regions": ["Tamil Nadu"] },
 
     { "date": "2016-04", "title": "Bharatmala programme takes shape", "kind": "sector",
@@ -50,7 +50,7 @@
       "modes": ["road"], "regions": [] },
 
     { "date": "2016-11-09", "end": "2016-12-02", "title": "Demonetisation, toll collection suspended nationwide", "kind": "policy",
-      "mechanism": "MoRTH suspended user fee collection on all national highways from 9 November to 2 December 2016. NHAI reported a loss of roughly Rs 1,238 crore against an average daily collection near Rs 51.6 crore. Any FY17 revenue series will show this hole; traffic itself also fell as cash-dependent trucking slowed.",
+      "mechanism": "MoRTH suspended user fee collection on all national highways from 9 November to 2 December 2016. NHAI reported a loss of roughly Rs 1,238 crore against an average daily collection near Rs 51.6 crore. Road movement also slowed while cash was scarce.",
       "modes": ["road"], "regions": [], "verified": true },
 
     { "date": "2017-07-01", "title": "GST rollout", "kind": "policy",
@@ -58,15 +58,15 @@
       "modes": ["road"], "regions": [] },
 
     { "date": "2018-04-01", "title": "E-way bill for inter-state movement", "kind": "policy",
-      "mechanism": "Created a national record of goods movement. Useful as a demand proxy in forecasting, and it shifted some informal freight into the formal count.",
+      "mechanism": "Created a national record of goods movement, and shifted some informal freight into the formal count.",
       "modes": ["road"], "regions": [] },
 
     { "date": "2018-07-16", "title": "Revision of axle load norms", "kind": "policy",
-      "mechanism": "Permissible gross vehicle weights raised by roughly 20 to 25 per cent. Same tonnage moved in fewer trips, so tonne-km rose while vehicle counts at plazas softened. Watch this carefully when comparing pre and post 2018 AADT.",
+      "mechanism": "Permissible gross vehicle weights raised by roughly 20 to 25 per cent. The same load moved in fewer trips, so vehicle counts fell even where the volume of goods did not. Counts before and after July 2018 are not directly comparable.",
       "modes": ["road"], "regions": [] },
 
     { "date": "2018-08", "title": "Kerala floods", "kind": "environment",
-      "mechanism": "State highways and NH stretches submerged, Kochi airport closed for two weeks, rail services suspended. Regional traffic series show a deep single-month trough.",
+      "mechanism": "State highways and NH stretches submerged, Kochi airport closed for two weeks, rail services suspended. Movement across the state fell steeply for a month.",
       "modes": ["road","rail","air"], "regions": ["Kerala"] },
 
     { "date": "2019-01-15", "end": "2019-03-04", "title": "Kumbh Mela, Prayagraj", "kind": "social",
@@ -78,11 +78,11 @@
       "modes": ["road","rail","air"], "regions": ["Odisha","West Bengal"] },
 
     { "date": "2019-07", "title": "Commercial vehicle sales downturn", "kind": "macro",
-      "mechanism": "A sharp fall in CV sales through FY20 signalled weakening freight demand ahead of the pandemic. Useful as a leading indicator in back-testing forecasts.",
+      "mechanism": "A sharp fall in commercial vehicle sales through FY20 signalled weakening freight demand well before the pandemic began.",
       "modes": ["road"], "regions": [] },
 
     { "date": "2020-03-25", "end": "2020-04-20", "title": "COVID-19 national lockdown, toll collection suspended", "kind": "macro",
-      "mechanism": "Toll collection on national highways was suspended from 25 March and resumed on 20 April 2020. Traffic fell to a small fraction of normal, recovering unevenly through FY21 with freight ahead of passenger movement. This is the single largest discontinuity in any Indian traffic series.",
+      "mechanism": "Toll collection on national highways was suspended from 25 March and resumed on 20 April 2020. Movement fell to a small fraction of normal and recovered unevenly through FY21, with freight returning ahead of passenger travel. The sharpest break in any Indian movement record.",
       "modes": ["road","rail","air","port"], "regions": [], "verified": true },
 
     { "date": "2020-05-20", "title": "Cyclone Amphan", "kind": "environment",
@@ -90,11 +90,11 @@
       "modes": ["road","rail","port"], "regions": ["West Bengal","Odisha"] },
 
     { "date": "2020-11-26", "end": "2021-12-11", "title": "Farmers' protest. Delhi border blockades", "kind": "social",
-      "mechanism": "Sustained blockades at Singhu, Tikri and Ghazipur diverted traffic off NH-44, NH-9 and NH-48 approaches to Delhi for over a year. Plazas on affected approaches show prolonged depressed volumes, and some were kept free.",
+      "mechanism": "Sustained blockades at Singhu, Tikri and Ghazipur pushed traffic off the NH-44, NH-9 and NH-48 approaches to Delhi for over a year. Several plazas on those approaches stayed open without charge throughout.",
       "modes": ["road"], "regions": ["Delhi","Haryana","Punjab","Uttar Pradesh"] },
 
     { "date": "2021-02-15", "title": "FASTag made mandatory", "kind": "policy",
-      "mechanism": "Electronic tolling became compulsory at national highway plazas. Transaction data quality improved sharply from this point, which matters when comparing pre and post 2021 plaza records.",
+      "mechanism": "Electronic tolling became compulsory at national highway plazas. Record keeping changed substantially from this point, so figures before and after February 2021 are measured differently.",
       "modes": ["road"], "regions": [] },
 
     { "date": "2021-04", "end": "2021-06", "title": "COVID-19 second wave", "kind": "macro",
@@ -110,7 +110,7 @@
       "modes": ["road","port"], "regions": [] },
 
     { "date": "2022-05", "title": "Record wheat export surge then ban", "kind": "policy",
-      "mechanism": "A brief export boom lifted grain movement to ports, followed by an abrupt export ban that reversed it. A clean example of policy whiplash showing up in port hinterland traffic.",
+      "mechanism": "A brief export boom lifted grain movement to ports, followed by an abrupt export ban that reversed it within weeks.",
       "modes": ["road","rail","port"], "regions": ["Punjab","Haryana","Madhya Pradesh","Gujarat"] },
 
     { "date": "2023-01", "title": "Joshimath subsidence", "kind": "environment",
@@ -130,11 +130,11 @@
       "modes": ["port","road","rail"], "regions": ["Gujarat","Maharashtra","Tamil Nadu","Kerala"] },
 
     { "date": "2024-01-12", "title": "Mumbai Trans Harbour Link opened", "kind": "sector",
-      "mechanism": "Atal Setu opened, redistributing traffic between Mumbai and Navi Mumbai and changing approach volumes on competing routes. A textbook diversion event.",
+      "mechanism": "Atal Setu opened, redistributing movement between Mumbai and Navi Mumbai and reducing volumes on the routes it replaced.",
       "modes": ["road"], "regions": ["Maharashtra"] },
 
     { "date": "2024-04-19", "end": "2024-06-04", "title": "General election", "kind": "social",
-      "mechanism": "Model code of conduct froze new announcements and awards. Expect a gap in the project pipeline across this window rather than a genuine slowdown in activity.",
+      "mechanism": "The model code of conduct froze new announcements and contract awards. Gaps in the project record across this window reflect the freeze rather than a real slowdown.",
       "modes": ["road","rail","air","port"], "regions": [] },
 
     { "date": "2024-07-30", "title": "Wayanad landslides", "kind": "environment",
