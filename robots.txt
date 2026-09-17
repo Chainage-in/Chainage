@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://REPLACE-WITH-YOUR-USERNAME.github.io/chainage/sitemap.xml
+Sitemap: https://chainage.in/sitemap.xml
