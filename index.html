@@ -6,8 +6,9 @@
 <title>Chainage. India Transport Corridor Monitor | NH, SH, AH and Expressway News</title>
 <meta name="description" content="Track what has affected traffic on any Indian highway corridor. Road, rail, air and port news from government releases and multiple news sources, organised by NH, SH, AH and expressway, with a saved-items list and downloadable data." />
 <meta name="keywords" content="India transport news, highway news India, NHAI news, toll plaza news, expressway news, national highway traffic, transport corridor monitor" />
-<link rel="canonical" href="./" />
+<link rel="canonical" href="https://chainage.in/" />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://chainage.in/" />
 <meta property="og:title" content="Chainage. India Transport Corridor Monitor" />
 <meta property="og:description" content="What happened on any Indian highway corridor, and what is coming. Corridor records, indicators and a dated event chronology." />
 <meta name="twitter:card" content="summary" />
@@ -18,7 +19,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"Chainage",
 "description":"India transport corridor monitor. Highway, rail, air and port news organised by corridor, with indicators and an event chronology.",
-"inLanguage":"en-IN","about":[{"@type":"Thing","name":"Indian national highways"},{"@type":"Thing","name":"Toll plazas"},{"@type":"Thing","name":"Transport infrastructure"}]}
+"url":"https://chainage.in/","inLanguage":"en-IN","about":[{"@type":"Thing","name":"Indian national highways"},{"@type":"Thing","name":"Toll plazas"},{"@type":"Thing","name":"Transport infrastructure"}]}
 </script>
 <style>
 :root{
@@ -223,6 +224,19 @@ button.tag:hover{border-color:var(--blue);color:var(--blue)}
 .foot-upd{border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:8px;margin-bottom:9px;
   font-family:inherit;font-variant-numeric:tabular-nums;font-size:.74rem}
 
+/* ---------- item detail ---------- */
+.detail{border-top:1px solid var(--bd-lt);margin:9px -12px 0;padding:10px 12px 11px;background:var(--zebra)}
+.dt-lead{font-size:.88rem;line-height:1.55;color:var(--tx);margin:0 0 5px;max-width:74ch}
+.dt-attr{font-size:.74rem;color:var(--tx-faint);margin:0 0 10px}
+.dt{border-collapse:collapse;font-size:.82rem;width:100%;max-width:580px;margin-bottom:10px}
+.dt th{text-align:left;font-weight:600;color:var(--tx-mid);padding:3px 14px 3px 0;white-space:nowrap;vertical-align:top;width:1%}
+.dt td{padding:3px 0;color:var(--tx)}
+.src-h{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx-faint);margin-bottom:5px}
+.src-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:5px}
+.src-li{background:#fff;border:1px solid var(--bd);padding:2px 8px;font-size:.78rem;color:var(--tx-mid)}
+.src-go{display:inline-block;background:var(--blue);color:#fff;padding:5px 12px;font-size:.8rem;font-weight:600;text-decoration:none}
+.src-go:hover{background:var(--blue-dk);color:#fff}
+
 /* ---------- dashboard ---------- */
 .pk{display:flex;flex-wrap:wrap;gap:12px 18px;padding-bottom:11px;border-bottom:1px solid var(--bd-lt);margin-bottom:11px}
 .pk-cat{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
@@ -298,6 +312,8 @@ body.hc .mkind,body.hc .vchk{background:#EDED00;color:#000}
 body.hc .chart-wrap,body.hc .tbl th,body.hc .tbl td,body.hc .tbl tr:nth-child(even) td,body.hc .rep{background:#000;color:#fff;border-color:#fff}
 body.hc .chart .ax{fill:#EDED00}
 body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
+body.hc .detail,body.hc .src-li{background:#000;border-color:#fff;color:#fff}
+body.hc .src-go{background:#EDED00;color:#000}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{.util,.navbar,.panel,.controls,.board{display:none}body{background:#fff}}
@@ -350,12 +366,12 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
 <div class="wrap" id="main">
 
   <!-- ============ FEED VIEW ============ -->
-  <section id="viewFeed">
     <div class="box" style="margin-top:14px">
       <div class="box-h">Filter by Mode <span class="sub">Select a mode to narrow the list</span></div>
       <div class="board" id="board" role="group" aria-label="Filter by mode"></div>
     </div>
 
+  <section id="viewFeed">
     <div class="box">
       <div class="box-h">Search and Filters</div>
       <div class="box-b">
@@ -381,16 +397,12 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
   <!-- ============ CORRIDOR VIEW ============ -->
   <section id="viewCorridor" class="hide">
     <div class="box" style="margin-top:14px">
-      <div class="box-h">Select Corridor <span class="sub">National, State, Asian highways and expressways on record</span></div>
+      <div class="box-h">Select an Asset <span class="sub">Pick a mode above, then choose from that mode</span></div>
       <div class="box-b">
         <div class="cpick">
-          <input class="search" id="cq" type="search" placeholder="Find a corridor: NH-27, SH-9, AH-45, Purvanchal..." aria-label="Find a corridor" />
-          <select class="pick" id="ckind" aria-label="Corridor type">
-            <option value="">All Types</option><option value="NH">National Highways</option>
-            <option value="SH">State Highways</option><option value="AH">Asian Highways</option>
-            <option value="EXP">Expressways</option><option value="MDR">Major District Roads</option>
-          </select>
-          <button class="btn ghost" id="backBtn" style="display:none">&laquo; All Corridors</button>
+          <input class="search" id="cq" type="search" placeholder="Find an asset: NH-27, Mundra, Kempegowda, Konkan..." aria-label="Find a corridor" />
+          <select class="pick" id="ckind" aria-label="Asset type"><option value="">All types</option></select>
+          <button class="btn ghost" id="backBtn" style="display:none">&laquo; Back to list</button>
         </div>
       </div>
     </div>
@@ -496,13 +508,26 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
                air:{label:"Air",color:"#2D5D8C"}, port:{label:"Ports",color:"#0F6157"},
                other:{label:"Other",color:"#6B6B66"} };
   var KIND = { NH:"National highway", SH:"State highway", AH:"Asian highway",
-               MDR:"Major district road", EXP:"Expressway" };
+               MDR:"Major district road", EXP:"Expressway",
+               DFC:"Dedicated freight corridor", RAIL:"Rail line", ZONE:"Railway zone",
+               AIRPORT:"Airport", PORT:"Port" };
+  // Which asset kinds belong to which mode, and what to call the list.
+  var MODE_ASSETS = {
+    road: { kinds:["NH","SH","AH","MDR","EXP"], title:"Corridors",
+            hint:"National, state and Asian highways, and expressways" },
+    rail: { kinds:["DFC","RAIL","ZONE"], title:"Rail Corridors and Lines",
+            hint:"Freight corridors, routes and railway zones" },
+    air:  { kinds:["AIRPORT"], title:"Airports", hint:"Airports on record" },
+    port: { kinds:["PORT"], title:"Ports", hint:"Ports and terminals on record" },
+    "":   { kinds:null, title:"All Assets", hint:"Corridors, lines, airports and ports" }
+  };
   var IMPACTS = ["Not assessed","Increases movement","Reduces movement","Raises cost","Lowers cost","No effect","Watch"];
   var STORE = "chainage.clips.v1";
 
   var data = { items: [], categories: [], signals: [], maturities: [], corridors: [], sources: [] };
   var clips = load();
   var openEditor = null;
+  var openDetail = null;
   var view = "feed";
   var corridor = null;
   var bg = { corridors: {} };   // corridor background from Wikipedia
@@ -581,7 +606,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       ? (data.sources||[]).length + " sources live"
       : bad.length + " of " + (data.sources||[]).length + " sources failed";
 
-    buildBoard(); buildChips(); buildSelects(); wire();
+    buildBoard(); buildChips(); buildSelects(); buildKindOptions(); wire();
 
     var p = new URLSearchParams(location.search).get("corridor");
     if (p) { corridor = p; switchTo("corridor"); } else { switchTo("feed"); }
@@ -593,7 +618,7 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     data.items.forEach(function(i){ counts[i.mode]=(counts[i.mode]||0)+1; });
     var html = '<button class="lane" data-mode="" aria-pressed="true" style="--bar:#17171A">' +
       '<span class="lane-l">All modes</span><span class="lane-n">'+data.items.length+'</span></button>';
-    ["road","rail","air","port","other"].forEach(function(m){
+    ["road","rail","air","port"].forEach(function(m){
       if(!counts[m]) return;
       html += '<button class="lane" data-mode="'+m+'" aria-pressed="false" style="--bar:'+MODE[m].color+'">' +
         '<span class="lane-l">'+MODE[m].label+'</span><span class="lane-n">'+counts[m]+'</span></button>';
@@ -603,7 +628,9 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       var b=e.target.closest(".lane"); if(!b) return;
       f.mode=b.dataset.mode;
       [].forEach.call($("board").children,function(c){ c.setAttribute("aria-pressed",String(c.dataset.mode===f.mode)); });
-      render();
+      buildKindOptions();
+      if(view==="corridor"){ corridor=null; setUrl(null); renderCorridor(); }
+      else render();
     });
   }
 
@@ -616,6 +643,20 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
       f.cats = on ? f.cats.filter(function(x){return x!==id;}) : f.cats.concat(id);
       b.setAttribute("aria-pressed",String(!on)); render();
     });
+  }
+
+  // The asset type dropdown only offers kinds that exist in the chosen mode.
+  function buildKindOptions(){
+    var sel = $("ckind"); if(!sel) return;
+    var scope = MODE_ASSETS[f.mode] || MODE_ASSETS[""];
+    var present = {};
+    (data.corridors||[]).forEach(function(c){
+      if(scope.kinds && scope.kinds.indexOf(c.kind)===-1) return;
+      present[c.kind] = (present[c.kind]||0)+1;
+    });
+    var keys = Object.keys(present).sort();
+    sel.innerHTML = '<option value="">All types</option>' + keys.map(function(k){
+      return '<option value="'+k+'">'+esc(KIND[k]||k)+' ('+present[k]+')</option>'; }).join("");
   }
 
   function buildSelects(){
@@ -740,8 +781,11 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
           '<span class="pub">'+esc(i.publisher||"Unattributed")+'</span><span>·</span><span>'+fmtDate(i.published)+'</span></div>' +
         (i.summary?'<p class="snip">'+esc(i.summary)+'</p>':'') +
         (tags?'<div class="tags">'+tags+'</div>':'') +
-        '<div class="row-actions"><button class="act clipBtn'+(clipped?" on":"")+'">'+(clipped?"Saved":"Save")+'</button>' +
+        '<div class="row-actions"><button class="act detailBtn'+(openDetail===i.id?" on":"")+'">'+
+          (openDetail===i.id?"Hide detail":"Detail")+'</button>' +
+          '<button class="act clipBtn'+(clipped?" on":"")+'">'+(clipped?"Saved":"Save")+'</button>' +
           (clipped?'<button class="act editBtn">Add note</button>':'')+'</div>' +
+        (openDetail===i.id ? detailHtml(i) : "") +
         (clipped && openEditor===i.id ? editorHtml(i) : "") +
       '</div></li>';
   }
@@ -773,6 +817,38 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     }
     html += '<option value="__other__">Something else, type it</option>';
     return html;
+  }
+
+  // Google News gives headlines, not article text, so there is no summary to
+  // write from. What it does give is every outlet that carried the story,
+  // which is more useful anyway: you choose which publisher to read.
+  function detailHtml(i){
+    var pubs = (i.publishers && i.publishers.length) ? i.publishers : [i.publisher];
+    var facts = [];
+    if(i.ministry) facts.push(["Issued by", i.ministry]);
+    facts.push(["First reported", fmtDate(i.published)]);
+    facts.push(["Outlets carrying it", String(pubs.length)]);
+    if(i.maturity && i.maturity!=="reported") facts.push(["Status claimed", labelOf(data.maturities||[], i.maturity)]);
+    if(i.signal && i.signal!=="info") facts.push(["Signal", labelOf(data.signals||[], i.signal)]);
+    if(i.targetYear) facts.push(["Year stated", String(i.targetYear)]);
+    if((i.regions||[]).length) facts.push(["States", i.regions.join(", ")]);
+    if((i.corridors||[]).length) facts.push(["Assets", i.corridors.map(function(c){return c.label;}).join(", ")]);
+    if((i.categories||[]).length) facts.push(["Type", i.categories.map(function(c){
+      return labelOf(data.categories||[], c); }).join(", ")]);
+
+    var lead = (i.summary && i.summary.length > 40 && i.summary !== i.title)
+      ? '<p class="dt-lead">'+esc(i.summary)+'</p>' +
+        '<p class="dt-attr">As published by '+esc(i.publisher||"the source")+'. Open the report for the full article.</p>'
+      : '<p class="dt-attr">This feed supplied a headline only. Open the report to read it.</p>';
+
+    return '<div class="detail">' + lead +
+      '<table class="dt">'+facts.map(function(f){
+        return '<tr><th>'+esc(f[0])+'</th><td>'+esc(f[1])+'</td></tr>'; }).join("")+'</table>' +
+      '<div class="src-h">Reported by '+pubs.length+(pubs.length===1?' outlet':' outlets')+'</div>' +
+      '<ul class="src-list">'+pubs.map(function(p){
+        return '<li class="src-li">'+esc(p)+'</li>'; }).join("")+'</ul>' +
+      '<a class="src-go" href="'+esc(i.url)+'" target="_blank" rel="noopener noreferrer">Open the original report</a>' +
+      '</div>';
   }
 
   function editorHtml(i){
@@ -808,6 +884,13 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
           openEditor = id;
         }
         save(); repaint();
+      });
+    });
+    root.querySelectorAll(".detailBtn").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id=b.closest(".item").dataset.id;
+        openDetail = openDetail===id ? null : id;
+        repaint();
       });
     });
     root.querySelectorAll(".editBtn").forEach(function(b){
@@ -1019,19 +1102,24 @@ body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
     $("backBtn").style.display = "none";
     var q = $("cq").value.trim().toLowerCase();
     var kind = $("ckind").value;
+    var scope = MODE_ASSETS[f.mode] || MODE_ASSETS[""];
     var list = (data.corridors||[]).filter(function(c){
+      if(scope.kinds && scope.kinds.indexOf(c.kind)===-1) return false;
       if(kind && c.kind!==kind) return false;
       if(q && (c.label+" "+(c.states||[]).join(" ")).toLowerCase().indexOf(q)===-1) return false;
       return true;
     });
     if(!list.length){
       $("corridorBody").innerHTML = '<div class="notice" style="margin-top:18px"><h2>No corridors match</h2>' +
-        '<p>Try a number on its own, like 27, or clear the type filter.</p></div>';
+        '<p>Try a number on its own, like 27, or pick a different mode above.</p></div>';
       return;
     }
-    var colorFor = { NH:"#E0A21A", SH:"#0F6157", AH:"#2D5D8C", EXP:"#8C2F27", MDR:"#6B6B66" };
+    var colorFor = { NH:"#B36B00", SH:"#0B6B5F", AH:"#0B4DA2", EXP:"#8C2F27", MDR:"#5A5A5A",
+                     DFC:"#8C2F27", RAIL:"#8C2F27", ZONE:"#8C2F27",
+                     AIRPORT:"#0B4DA2", PORT:"#0B6B5F" };
     $("corridorBody").innerHTML =
-      '<p class="count" style="padding-top:16px">'+list.length+' corridors on record · newest activity first within each</p>' +
+      '<div class="box" style="margin-bottom:0"><div class="box-h">'+esc(scope.title)+
+      '<span class="sub">'+list.length+' on record · '+esc(scope.hint)+'</span></div></div>' +
       '<ul class="clist">' + list.slice(0,400).map(function(c){
         return '<li><button class="ccard" data-corridor="'+esc(c.code)+'" style="--bar:'+(colorFor[c.kind]||"#6B6B66")+'">' +
           '<div class="ccard-in"><span class="ccard-code">'+esc(c.label)+'</span>' +
