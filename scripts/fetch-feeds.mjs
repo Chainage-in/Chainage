@@ -99,7 +99,41 @@ const NAMED_EXPRESSWAYS = [
   "Varanasi-Kolkata Expressway", "Patna-Purnea Expressway", "Gorakhpur-Siliguri Expressway",
   "Amritsar-Jamnagar Expressway", "Ambala-Kotputli", "Pune Ring Road",
   "Mumbai Trans Harbour Link", "Atal Setu", "Chenab Bridge",
-  "Eastern Dedicated Freight Corridor", "Western Dedicated Freight Corridor",
+];
+
+// Assets worth tracking per mode. Road has numbered corridors; the other modes
+// have named fixed assets that news attaches to just as reliably.
+const AIRPORTS = [
+  "Indira Gandhi International","Kempegowda International","Chhatrapati Shivaji Maharaj International",
+  "Rajiv Gandhi International","Netaji Subhas Chandra Bose International","Sardar Vallabhbhai Patel International",
+  "Cochin International","Trivandrum International","Calicut International","Mangaluru International",
+  "Jay Prakash Narayan International","Lokpriya Gopinath Bordoloi International","Biju Patnaik International",
+  "Devi Ahilya Bai Holkar","Chaudhary Charan Singh International","Lal Bahadur Shastri International",
+  "Sri Guru Ram Dass Jee International","Jolly Grant","Noida International","Jewar",
+  "Navi Mumbai International","Mopa","Manohar International","Shivamogga","Hollongi","Donyi Polo",
+  "Pune","Nagpur","Goa","Jaipur","Lucknow","Patna","Guwahati","Bhubaneswar","Coimbatore","Madurai",
+  "Tiruchirappalli","Visakhapatnam","Vijayawada","Indore","Raipur","Ranchi","Varanasi","Amritsar",
+  "Srinagar","Jammu","Leh","Port Blair","Agartala","Imphal","Dibrugarh","Silchar","Bagdogra","Dehradun",
+  "Surat","Rajkot","Vadodara","Bhopal","Chandigarh","Hubballi","Belagavi","Kannur","Kolhapur",
+];
+
+const PORTS = [
+  "Jawaharlal Nehru","JNPA","JNPT","Mundra","Kandla","Deendayal","Mormugao","New Mangalore",
+  "Cochin","Tuticorin","V O Chidambaranar","Chennai","Kamarajar","Ennore","Visakhapatnam",
+  "Paradip","Haldia","Kolkata","Syama Prasad Mookerjee","Dhamra","Gangavaram","Krishnapatnam",
+  "Kakinada","Pipavav","Hazira","Dahej","Vadhavan","Karaikal","Katupalli","Kattupalli","Rewas",
+  "Tuna Tekra","Vizhinjam","Kulasekarapattinam","Machilipatnam","Sagar",
+];
+
+const RAIL_ASSETS = [
+  "Eastern Dedicated Freight Corridor","Western Dedicated Freight Corridor",
+  "East Coast Dedicated Freight Corridor","East West Dedicated Freight Corridor",
+  "North South Dedicated Freight Corridor","Sonnagar-Dankuni",
+  "Northern Railway","Southern Railway","Western Railway","Eastern Railway","Central Railway",
+  "North Eastern Railway","Northeast Frontier Railway","South Central Railway","South Eastern Railway",
+  "South East Central Railway","South Western Railway","North Western Railway","North Central Railway",
+  "East Central Railway","East Coast Railway","West Central Railway","Konkan Railway",
+  "Mumbai-Ahmedabad High Speed Rail","Delhi-Meerut RRTS","Namo Bharat",
 ];
 
 function canonCode(kind, num) {
@@ -173,7 +207,44 @@ function extractCorridors(text) {
   const reExp = /\b([A-Z][A-Za-z]+(?:[-\u2013][A-Z][A-Za-z]+)*(?:\s[A-Z][A-Za-z]+)?)\s+Expressway\b/g;
   while ((m = reExp.exec(text)) !== null) addExpressway(m[1] + " Expressway");
 
-  return [...found.values()].slice(0, 8);
+  // ---- rail ----
+  for (const name of RAIL_ASSETS) {
+    if (lower.includes(name.toLowerCase())) {
+      const kind = /freight corridor/i.test(name) ? "DFC" : /rrts|high speed|namo/i.test(name) ? "RAIL" : "ZONE";
+      found.set(kind + ":" + name.replace(/\s+/g, "-"),
+        { code: kind + ":" + name.replace(/\s+/g, "-"), kind, label: name });
+    }
+  }
+  // "Delhi-Howrah route", "Mumbai-Nagpur rail line"
+  const reLine = /\b([A-Z][a-z]{3,})[-\u2013]([A-Z][a-z]{3,})\s+(?:rail|railway|route|line|section)\b/g;
+  while ((m = reLine.exec(text)) !== null) {
+    const pair = [m[1], m[2]].sort((a, b) => a.localeCompare(b)).join("-");
+    const label = pair + " rail line";
+    found.set("RAIL:" + pair, { code: "RAIL:" + pair, kind: "RAIL", label });
+  }
+
+  // ---- air ----
+  for (const name of AIRPORTS) {
+    const re = new RegExp("\\b" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+                          "(?:\\s+(?:International\\s+)?Airport)?\\b", "i");
+    if (!re.test(text)) continue;
+    if (!/airport|aerodrome|terminal|runway|flight/i.test(text)) continue;
+    const label = /airport/i.test(name) ? name : name + " Airport";
+    found.set("AIR:" + label.replace(/\s+/g, "-"),
+      { code: "AIR:" + label.replace(/\s+/g, "-"), kind: "AIRPORT", label });
+  }
+
+  // ---- ports ----
+  for (const name of PORTS) {
+    const re = new RegExp("\\b" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
+    if (!re.test(text)) continue;
+    if (!/port|terminal|berth|cargo|container|shipping|jetty/i.test(text)) continue;
+    const label = /port/i.test(name) ? name : name + " Port";
+    found.set("SEA:" + label.replace(/\s+/g, "-"),
+      { code: "SEA:" + label.replace(/\s+/g, "-"), kind: "PORT", label });
+  }
+
+  return [...found.values()].slice(0, 10);
 }
 
 /* ================================================================== */
@@ -239,7 +310,7 @@ function parsePibAllRel(html) {
 
 const MODES = [
   { id: "road", label: "Road", terms: ["highway","nhai","morth","expressway","toll","fastag","national highway","bypass","flyover","road transport","trucking","truckers","bot toll","ham project","carriageway","lane","ring road","four-laning","six-laning"] },
-  { id: "rail", label: "Rail", terms: ["railway","railways","rail","train","dfccil","freight corridor","vande bharat","metro","locomotive","wagon","rrts","gauge","doubling","electrification"] },
+  { id: "rail", label: "Rail", terms: ["railway","railways","rail","train","dfccil","freight corridor","vande bharat","metro","locomotive","wagon","rrts","gauge","doubling","electrification","rake","rakes","goods train","freight train","siding","freight loading","despatch by rail","railhead"] },
   { id: "air",  label: "Air",  terms: ["airport","airline","aviation","dgca","flight","air passenger","terminal building","airports authority","udan","runway"] },
   { id: "port", label: "Ports & shipping", terms: ["port","shipping","cargo","container","maritime","vessel","jnpt","sagarmala","waterway","shipyard","tonnage","teu","berth"] },
 ];
@@ -300,6 +371,46 @@ function bestMatch(text, table) {
   return best;
 }
 
+// Numbers that make a project trackable: what it is said to cost, how long it
+// is, and how many lanes. All three appear in headlines often enough to build
+// a pipeline record from, and drift between successive reports is the signal.
+function extractFigures(raw) {
+  const out = {};
+
+  // Cost. Indian reporting mixes crore and lakh crore; normalise to Rs crore.
+  const cost = raw.match(/(?:Rs\.?|₹|INR)\s*([\d,]+(?:\.\d+)?)\s*(lakh\s+crore|crore|cr|billion|bn|million|mn)/i);
+  if (cost) {
+    const n = parseFloat(cost[1].replace(/,/g, ""));
+    const unit = cost[2].toLowerCase();
+    if (isFinite(n)) {
+      out.costCrore =
+        /lakh\s+crore/.test(unit) ? n * 100000 :
+        /crore|cr/.test(unit)     ? n :
+        /billion|bn/.test(unit)   ? n * 100 :      // Rs billion = 100 crore
+        /million|mn/.test(unit)   ? n / 10 : null; // Rs million = 0.1 crore
+      if (out.costCrore !== null) out.costCrore = Math.round(out.costCrore * 100) / 100;
+      else delete out.costCrore;
+    }
+  }
+
+  // Length. "160-km-long", "52 km stretch", "1,386 km expressway".
+  const len = raw.match(/\b([\d,]+(?:\.\d+)?)\s*[-\s]?(?:km|kms|kilometre|kilometer)s?\b/i);
+  if (len) {
+    const n = parseFloat(len[1].replace(/,/g, ""));
+    if (isFinite(n) && n > 0 && n < 6000) out.lengthKm = n;
+  }
+
+  // Lanes.
+  const lane = raw.match(/\b(two|four|six|eight|2|4|6|8)[\s-]?lan(?:e|ing)\b/i);
+  if (lane) {
+    const w = { two: 2, four: 4, six: 6, eight: 8 };
+    const v = w[lane[1].toLowerCase()] || parseInt(lane[1], 10);
+    if (v) out.lanes = v;
+  }
+
+  return out;
+}
+
 function classify(title, summary) {
   const raw = `${title} ${summary}`;
   const text = lc(raw);
@@ -328,6 +439,7 @@ function classify(title, summary) {
   }
 
   return {
+    ...extractFigures(raw),
     mode,
     categories,
     signal,
@@ -510,7 +622,14 @@ async function main() {
   try {
     const prev = JSON.parse(await readFile(resolve(ROOT, "data", "news.json"), "utf8"));
     archive = Array.isArray(prev.items) ? prev.items : [];
-    console.log(`Carrying forward ${archive.length} archived items.`);
+
+    // Re-run classification over everything already collected, so corrections
+    // to corridor naming, mode or status apply to the whole archive rather than
+    // only to items gathered after the fix.
+    archive = archive
+      .map((i) => ({ ...i, ...classify(i.title, i.summary || "") }))
+      .filter((i) => i.mode !== "other");
+    console.log(`Carrying forward ${archive.length} archived items, reclassified.`);
   } catch { console.log("No existing archive; starting fresh."); }
 
   const targets = cfg.feeds.map((f) => ({
@@ -557,6 +676,13 @@ async function main() {
         // "Telangana Today" tags every story Telangana. Strip it before tagging.
         const cleanSummary = stripPublisher(raw.summary, pub, headline);
 
+        const cls = classify(headline, cleanSummary + " " + (raw.ministry || ""));
+
+        // Anything that cannot be tied to a mode is not transport news, so it
+        // does not belong in the record. This is what removes the old "Other"
+        // pile of general industry and policy stories.
+        if (cls.mode === "other") continue;
+
         fresh.push({
           title: headline,
           url: raw.link,
@@ -565,7 +691,7 @@ async function main() {
           published: iso,
           summary: cleanSummary.slice(0, 320),
           ministry: raw.ministry || undefined,
-          ...classify(headline, cleanSummary + " " + (raw.ministry || "")),
+          ...cls,
         });
         kept++;
       }
@@ -640,8 +766,59 @@ async function main() {
     console.log(`Loaded ${macro.length} curated macro events.`);
   } catch { console.log("No history/macro-events.json, skipping macro timeline."); }
 
+  // Pipeline record per corridor: the sequence of stated costs, lengths and
+  // completion years, oldest first, with the drift between the first and last
+  // figure on record. Derived from headlines, so it shows where to look rather
+  // than what is true. Verify package by package before using any of it.
+  const pipeMap = new Map();
+  for (const it of items) {
+    if (it.costCrore === undefined && it.targetYear == null && it.lengthKm === undefined) continue;
+    for (const c of it.corridors || []) {
+      let e = pipeMap.get(c.code);
+      if (!e) { e = { code: c.code, label: c.label, kind: c.kind, obs: [] }; pipeMap.set(c.code, e); }
+      e.obs.push({
+        date: it.published.slice(0, 10),
+        costCrore: it.costCrore, lengthKm: it.lengthKm, lanes: it.lanes,
+        targetYear: it.targetYear, maturity: it.maturity,
+        publisher: it.publisher, sources: it.corroboration || 1,
+        title: it.title, url: it.url,
+      });
+    }
+  }
+
+  const pipeline = [...pipeMap.values()].map((e) => {
+    e.obs.sort((a, b) => a.date.localeCompare(b.date));
+    const costs = e.obs.filter((o) => o.costCrore !== undefined);
+    const years = e.obs.filter((o) => o.targetYear != null);
+    const out = { ...e, observations: e.obs.length };
+    if (costs.length >= 1) {
+      out.firstCost = costs[0].costCrore;
+      out.latestCost = costs[costs.length - 1].costCrore;
+      out.firstCostDate = costs[0].date;
+      out.latestCostDate = costs[costs.length - 1].date;
+      if (costs.length >= 2 && out.firstCost > 0) {
+        out.costChangePct = Math.round(((out.latestCost - out.firstCost) / out.firstCost) * 1000) / 10;
+      }
+    }
+    if (years.length >= 1) {
+      out.firstTargetYear = years[0].targetYear;
+      out.latestTargetYear = years[years.length - 1].targetYear;
+      if (years.length >= 2) out.targetSlipYears = out.latestTargetYear - out.firstTargetYear;
+    }
+    const withLen = e.obs.filter((o) => o.lengthKm !== undefined);
+    if (withLen.length) out.lengthKm = withLen[withLen.length - 1].lengthKm;
+    delete out.obs;
+    out.obs = e.obs.slice(-24);   // keep the tail, enough to show the trail
+    return out;
+  }).sort((a, b) => b.observations - a.observations);
+
+  console.log(`Pipeline: ${pipeline.length} corridors with stated figures, ` +
+    `${pipeline.filter((p) => p.costChangePct !== undefined).length} with a cost trail, ` +
+    `${pipeline.filter((p) => p.targetSlipYears).length} with a date change.`);
+
   const payload = {
     updated: new Date().toISOString(),
+    pipeline,
     macro,
     count: items.length,
     sources: sourceLog,
