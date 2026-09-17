@@ -224,6 +224,19 @@ button.tag:hover{border-color:var(--blue);color:var(--blue)}
 .foot-upd{border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:8px;margin-bottom:9px;
   font-family:inherit;font-variant-numeric:tabular-nums;font-size:.74rem}
 
+/* ---------- stated figures ---------- */
+.pp-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:11px}
+.pp-fig{background:var(--blue-lt);border:1px solid var(--bd-lt);padding:7px 11px;min-width:190px}
+.pp-l{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx-faint)}
+.pp-v{display:block;font-size:.95rem;font-weight:600;color:var(--blue-dk);margin-top:3px;font-variant-numeric:tabular-nums}
+.pp-v i{font-style:normal;color:var(--tx-faint);padding:0 2px}
+.pp-d{display:inline-block;font-size:.76rem;font-weight:700;margin-top:3px}
+.pp-d.up{color:#8C2F27}
+.pp-d.dn{color:#0B6B5F}
+.pp-t th,.pp-t td{text-align:left}
+.pp-src a{font-size:.8rem}
+.pp-n{color:var(--tx-faint);font-size:.72rem}
+
 /* ---------- item detail ---------- */
 .detail{border-top:1px solid var(--bd-lt);margin:9px -12px 0;padding:10px 12px 11px;background:var(--zebra)}
 .dt-lead{font-size:.88rem;line-height:1.55;color:var(--tx);margin:0 0 5px;max-width:74ch}
@@ -312,7 +325,8 @@ body.hc .mkind,body.hc .vchk{background:#EDED00;color:#000}
 body.hc .chart-wrap,body.hc .tbl th,body.hc .tbl td,body.hc .tbl tr:nth-child(even) td,body.hc .rep{background:#000;color:#fff;border-color:#fff}
 body.hc .chart .ax{fill:#EDED00}
 body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
-body.hc .detail,body.hc .src-li{background:#000;border-color:#fff;color:#fff}
+body.hc .detail,body.hc .src-li,body.hc .pp-fig{background:#000;border-color:#fff;color:#fff}
+body.hc .pp-d.up,body.hc .pp-d.dn,body.hc .pp-v{color:#EDED00}
 body.hc .src-go{background:#EDED00;color:#000}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -524,7 +538,7 @@ body.hc .src-go{background:#EDED00;color:#000}
   var IMPACTS = ["Not assessed","Increases movement","Reduces movement","Raises cost","Lowers cost","No effect","Watch"];
   var STORE = "chainage.clips.v1";
 
-  var data = { items: [], categories: [], signals: [], maturities: [], corridors: [], sources: [] };
+  var data = { items: [], categories: [], signals: [], maturities: [], corridors: [], sources: [], pipeline: [] };
   var clips = load();
   var openEditor = null;
   var openDetail = null;
@@ -1021,6 +1035,7 @@ body.hc .src-go{background:#EDED00;color:#000}
                     past, true);
     html += section("What is coming", "Announced, sanctioned, awarded or under construction. Sorted by stated target year, these are claims from the source, not commitments.",
                     fwd, false);
+    html += pipelineHtml(corridor);
     html += backgroundHtml(corridor);
     html += nearbyHtml(list);
 
@@ -1053,6 +1068,50 @@ body.hc .src-go{background:#EDED00;color:#000}
       out += '</ul>';
     }
     return out + '</div>';
+  }
+
+  // What successive reports have said this project costs and when it will open.
+  // Figures come from headlines, so this points at where to look rather than
+  // settling anything. Check package by package before using it.
+  function pipelineHtml(code){
+    var p = (data.pipeline||[]).filter(function(x){ return x.code===code; })[0];
+    if(!p || !p.obs || p.obs.length<2) return "";
+
+    var money = function(v){
+      if(v===undefined||v===null) return "";
+      return v>=100000 ? "Rs "+(v/100000).toFixed(2)+" lakh cr" : "Rs "+v.toLocaleString("en-IN")+" cr";
+    };
+    var head = "";
+    if(p.costChangePct!==undefined){
+      var up = p.costChangePct>0;
+      head += '<div class="pp-fig"><span class="pp-l">Stated cost</span>' +
+        '<span class="pp-v">'+esc(money(p.firstCost))+' <i>&rarr;</i> '+esc(money(p.latestCost))+'</span>' +
+        '<span class="pp-d '+(up?"up":"dn")+'">'+(up?"+":"")+p.costChangePct+'%</span></div>';
+    }
+    if(p.targetSlipYears){
+      head += '<div class="pp-fig"><span class="pp-l">Stated completion</span>' +
+        '<span class="pp-v">'+p.firstTargetYear+' <i>&rarr;</i> '+p.latestTargetYear+'</span>' +
+        '<span class="pp-d '+(p.targetSlipYears>0?"up":"dn")+'">'+(p.targetSlipYears>0?"+":"")+p.targetSlipYears+' yr</span></div>';
+    }
+    if(p.lengthKm) head += '<div class="pp-fig"><span class="pp-l">Stated length</span>' +
+      '<span class="pp-v">'+p.lengthKm+' km</span></div>';
+
+    var rows = p.obs.slice().reverse().map(function(o){
+      return '<tr><td class="tp">'+fmtDate(o.date)+'</td>' +
+        '<td>'+esc(o.costCrore!==undefined?money(o.costCrore):"")+'</td>' +
+        '<td>'+(o.targetYear||"")+'</td>' +
+        '<td>'+esc(o.maturity&&o.maturity!=="reported"?labelOf(data.maturities||[],o.maturity):"")+'</td>' +
+        '<td class="pp-src"><a href="'+esc(o.url)+'" target="_blank" rel="noopener noreferrer">'+esc(o.publisher||"source")+'</a>' +
+        (o.sources>1?' <span class="pp-n">'+o.sources+' outlets</span>':'')+'</td></tr>';
+    }).join("");
+
+    return '<div class="sec"><div class="sec-h"><h3 class="sec-t">Stated Figures Over Time</h3>' +
+      '<p class="sec-d">How successive reports have described this. Taken from headlines, so verify before use.</p></div>' +
+      '<div style="border:1px solid var(--bd);border-top:0;background:var(--box);padding:11px 13px">' +
+      (head?'<div class="pp-head">'+head+'</div>':'') +
+      '<div class="tbl-wrap"><table class="tbl pp-t"><thead><tr><th>Reported</th><th>Cost</th>' +
+      '<th>Target</th><th>Status</th><th>Source</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+      '</div></div>';
   }
 
   function backgroundHtml(code){
