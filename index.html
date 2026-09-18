@@ -1010,10 +1010,11 @@ body.hc .src-go{background:#EDED00;color:#000}
     var list = itemsOn(corridor).sort(function(a,b){ return new Date(b.published)-new Date(a.published); });
     var meta = (data.corridors||[]).filter(function(c){ return c.code===corridor; })[0] ||
                { label:corridor, kind:"NH", states:[], count:list.length };
-    if(!list.length){
-      $("corridorBody").innerHTML = '<div class="notice" style="margin-top:18px"><h2>Nothing collected on this corridor yet</h2>' +
-        '<p>Chainage builds its record from the day you first run it. Older events will not be here. ' +
-        'Try a broader corridor, or search the corridor name under All news.</p></div>';
+    var hasBg = ((bg.corridors||{})[corridor]||{}).found;
+    if(!list.length && !hasBg){
+      $("corridorBody").innerHTML = '<div class="notice" style="margin-top:18px"><h2>Nothing on record yet</h2>' +
+        '<p>No reports collected on this one, and no published history found for it. Collection began recently, ' +
+        'so quiet assets fill in over time.</p></div>';
       return;
     }
 
@@ -1021,14 +1022,20 @@ body.hc .src-go{background:#EDED00;color:#000}
     var fwd  = list.filter(function(i){ return i.horizon==="forward"; })
                    .sort(function(a,b){ return (a.targetYear||9999)-(b.targetYear||9999) || new Date(b.published)-new Date(a.published); });
 
+    var meta2 = (data.corridors||[]).filter(function(c){ return c.code===corridor; })[0] || {};
+    var modeGuess = list.length ? list[0].mode
+      : ({NH:"road",SH:"road",AH:"road",MDR:"road",EXP:"road",
+          DFC:"rail",RAIL:"rail",ZONE:"rail",AIRPORT:"air",PORT:"port"})[meta2.kind] || "road";
     var html =
-      '<div class="marker" style="border-top-color:'+(MODE[list[0].mode]||MODE.road).color+'">' +
+      '<div class="marker" style="border-top-color:'+(MODE[modeGuess]||MODE.road).color+'">' +
       '<div class="marker-in"><div><h2 class="marker-code">'+esc(meta.label)+'</h2>' +
       '<p class="marker-st">'+esc(KIND[meta.kind]||"Corridor")+
-      (meta.states&&meta.states.length?' · '+esc(meta.states.join(", ")):'')+'</p></div>' +
-      '<div class="marker-nums"><b>'+list.length+'</b> items on record<br>' +
-      '<b>'+past.length+'</b> past events · <b>'+fwd.length+'</b> ahead<br>' +
-      'earliest '+fmtDate(list[list.length-1].published)+'</div></div></div>';
+      (meta.states&&meta.states.length?' · '+esc(meta.states.join(", ")):'')+
+      (meta2.note?' · '+esc(meta2.note):'')+(meta2.lengthKm?' · '+meta2.lengthKm+' km':'')+'</p></div>' +
+      '<div class="marker-nums"><b>'+list.length+'</b> report'+(list.length===1?'':'s')+' collected<br>' +
+      '<b>'+past.length+'</b> past · <b>'+fwd.length+'</b> ahead<br>' +
+      (list.length ? 'earliest '+fmtDate(list[list.length-1].published)
+                   : (hasBg ? 'published history below' : ''))+'</div></div></div>';
 
     html += combinedHtml(corridor, past);
     html += section("What is coming", "Announced, sanctioned, awarded or under construction. Sorted by stated target year, these are claims from the source, not commitments.",
@@ -1213,7 +1220,7 @@ body.hc .src-go{background:#EDED00;color:#000}
           '<span class="ccard-st">'+esc((c.states||[]).slice(0,3).join(", ")||c.note||KIND[c.kind]||"")+'</span>' +
           '<span class="ccard-n">'+(c.count
               ? c.count+' item'+(c.count===1?"":"s")+(c.last?' · to '+fmtDate(c.last):"")
-              : 'No coverage yet')+
+              : 'No reports collected yet')+
             (c.lengthKm?' · '+c.lengthKm+' km':'')+'</span>' +
           '</div></button></li>'; }).join("") + '</ul>';
     $("corridorBody").querySelectorAll("[data-corridor]").forEach(function(b){
