@@ -137,17 +137,29 @@ async function main() {
   const out = { ...prior };
   let fetched = 0, skipped = 0, missed = 0;
 
-  // Never checked first, then whatever was checked longest ago. Assets with
-  // news attached come before empty ones within each group.
+  // Order matters more than batch size. A run that spends itself on three digit
+  // subsidiary highways returns almost nothing, because Wikipedia rarely covers
+  // them. Anything with news comes first, then the assets most likely to have
+  // been written about, and the long tail of minor spurs goes last.
+  function rank(c) {
+    if (c.count > 0) return 0;                       // something already happened on it
+    if (c.kind === "AIRPORT" || c.kind === "PORT") return 1;
+    if (c.kind === "ZONE" || c.kind === "DFC") return 2;
+    if (c.kind === "EXP") return 3;
+    if (c.kind === "NH") {
+      const n = String(c.code).replace("NH-", "");
+      if (/^\d{1,2}$/.test(n)) return 4;             // primary, NH 1 to 99
+      if (/^\d{3}$/.test(n)) return 5;               // three digit, no suffix
+      return 6;                                      // lettered spurs, rarely covered
+    }
+    return 7;
+  }
+
   const due = corridors.filter((c) => {
     const e = out[c.code];
     if (!e || !e.checked) return true;
     return Date.now() - new Date(e.checked).getTime() >= REFRESH_DAYS * 864e5;
-  }).sort((a, b) => {
-    const ea = out[a.code], eb = out[b.code];
-    if (!ea !== !eb) return ea ? 1 : -1;
-    return (b.count || 0) - (a.count || 0);
-  });
+  }).sort((a, b) => rank(a) - rank(b) || (b.count || 0) - (a.count || 0));
 
   skipped = corridors.length - due.length;
   const batch = due.slice(0, BATCH);
