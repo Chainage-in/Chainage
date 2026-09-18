@@ -3,10 +3,9 @@
   "googleNewsTemplate": "https://news.google.com/rss/search?q={QUERY}&hl=en-IN&gl=IN&ceid=IN:en",
   "feeds": [
     {
-      "name": "PIB Press Releases",
-      "url": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=48",
-      "warm": "https://www.pib.gov.in/indexd.aspx?lang=1&reg=48",
-      "fallback": "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+      "name": "PIB All Releases (English, National)",
+      "url": "https://www.pib.gov.in/allRel.aspx?reg=48&lang=1",
+      "type": "pib-allrel",
       "publisher": "Press Information Bureau",
       "official": true,
       "gate": true
@@ -95,7 +94,7 @@
     },
     {
       "name": "Mining, industry & freight demand",
-      "query": "India (\"iron ore\" OR coal OR cement OR steel) (dispatch OR production OR ban OR output)",
+      "query": "India (\"iron ore\" OR coal OR cement OR steel) (despatch OR rake OR freight OR transport OR movement OR port)",
       "gate": false
     },
     {
@@ -105,12 +104,160 @@
     },
     {
       "name": "Macro demand indicators",
-      "query": "India GDP OR industrial output OR e-way bill OR vehicle sales impact freight",
+      "query": "India (\"e-way bill\" OR \"vehicle sales\" OR \"freight demand\" OR logistics) (growth OR decline OR data)",
       "gate": false
     },
     {
       "name": "Strikes, bandhs & disruptions",
       "query": "India transporters strike OR bandh OR truckers protest highway disruption",
+      "gate": false
+    },
+    {
+      "name": "Highway construction progress",
+      "query": "India highway four-laning OR six-laning OR widening progress package",
+      "gate": false
+    },
+    {
+      "name": "Bypasses, bridges and ring roads",
+      "query": "India bypass OR ring road OR bridge opened highway",
+      "gate": false
+    },
+    {
+      "name": "Land acquisition and clearances",
+      "query": "India highway land acquisition OR forest clearance OR environmental clearance corridor",
+      "gate": false
+    },
+    {
+      "name": "State highway and PWD works",
+      "query": "state highway OR PWD road widening India tender",
+      "gate": false
+    },
+    {
+      "name": "Road accidents and safety",
+      "query": "India national highway accident OR black spot OR road safety audit",
+      "gate": false
+    },
+    {
+      "name": "Rail projects and stations",
+      "query": "Indian Railways station redevelopment OR new terminal OR yard remodelling",
+      "gate": false
+    },
+    {
+      "name": "Rail freight terminals",
+      "query": "India Gati Shakti cargo terminal OR private freight terminal OR siding commissioned",
+      "gate": false
+    },
+    {
+      "name": "Metro and regional rail",
+      "query": "India metro rail OR RRTS OR Namo Bharat corridor opened OR sanctioned",
+      "gate": false
+    },
+    {
+      "name": "Airport projects and capacity",
+      "query": "India airport runway OR apron OR terminal expansion commissioned",
+      "gate": false
+    },
+    {
+      "name": "Airport traffic data",
+      "query": "India airport passenger traffic OR cargo tonnage monthly data",
+      "gate": false
+    },
+    {
+      "name": "Port projects and berths",
+      "query": "India port berth OR jetty OR terminal commissioned OR concession",
+      "gate": false
+    },
+    {
+      "name": "Inland waterways",
+      "query": "India national waterway OR inland vessel OR IWAI cargo movement",
+      "gate": false
+    },
+    {
+      "name": "Weather disruption to transport",
+      "query": "India monsoon OR cyclone OR flood highway OR rail OR airport disruption",
+      "gate": false
+    },
+    {
+      "name": "Multimodal and ICD",
+      "query": "India inland container depot OR multimodal logistics park OR dry port",
+      "gate": false
+    },
+    {
+      "name": "BusinessLine Logistics",
+      "url": "https://www.thehindubusinessline.com/economy/logistics/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": false
+    },
+    {
+      "name": "BusinessLine Economy",
+      "url": "https://www.thehindubusinessline.com/economy/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": true
+    },
+    {
+      "name": "BusinessLine Macro Economy",
+      "url": "https://www.thehindubusinessline.com/economy/macro-economy/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": true
+    },
+    {
+      "name": "BusinessLine Policy",
+      "url": "https://www.thehindubusinessline.com/economy/policy/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": true
+    },
+    {
+      "name": "BusinessLine Companies",
+      "url": "https://www.thehindubusinessline.com/companies/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": true
+    },
+    {
+      "name": "BusinessLine Commodities",
+      "url": "https://www.thehindubusinessline.com/markets/commodities/feeder/default.rss",
+      "publisher": "The Hindu BusinessLine",
+      "gate": true
+    },
+    {
+      "name": "The Hindu Business",
+      "url": "https://www.thehindu.com/business/feeder/default.rss",
+      "publisher": "The Hindu",
+      "gate": true
+    },
+    {
+      "name": "The Hindu National",
+      "url": "https://www.thehindu.com/news/national/feeder/default.rss",
+      "publisher": "The Hindu",
+      "gate": true
+    },
+    {
+      "name": "Airport privatisation and PPP",
+      "query": "India airport privatisation OR PPP OR lease OR bundle AAI private operator",
+      "gate": false
+    },
+    {
+      "name": "Airport bids and concessions",
+      "query": "India airport bid OR concession OR operator selected OR handover AAI",
+      "gate": false
+    },
+    {
+      "name": "Port privatisation and PPP",
+      "query": "India port privatisation OR PPP OR concession OR berth operator bid",
+      "gate": false
+    },
+    {
+      "name": "Rail asset monetisation",
+      "query": "Indian Railways station OR terminal monetisation OR PPP OR private operator",
+      "gate": false
+    },
+    {
+      "name": "National monetisation pipeline",
+      "query": "India \"National Monetisation Pipeline\" OR \"asset monetisation\" roads OR airports OR ports OR railways",
+      "gate": false
+    },
+    {
+      "name": "Infrastructure divestment and stake sales",
+      "query": "India infrastructure divestment OR stake sale OR InvIT roads OR airports OR ports",
       "gate": false
     }
   ]
