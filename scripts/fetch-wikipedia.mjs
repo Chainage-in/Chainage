@@ -13,8 +13,12 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://en.wikipedia.org/w/api.php";
 const UA = "Chainage/1.0 (corridor history tool; contact via repository)";
-const MAX_CORRIDORS = 220;
-const PAUSE_MS = 250;
+// Fetched in batches so a first run does not take an hour. Assets with no
+// background yet are done first, so coverage fills in over a few runs and then
+// only refreshes.
+const BATCH = 400;
+const REFRESH_DAYS = 120;
+const PAUSE_MS = 180;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -27,24 +31,29 @@ async function api(params) {
 
 // Candidate article titles for a corridor code, best guess first.
 function candidates(c) {
-  if (c.kind === "EXP") return [c.label, c.label + " (India)"];
+  const label = c.label;
+  if (c.kind === "EXP") return [label, label + " (India)", label.replace(/ Expressway$/, "")+" Expressway"];
   if (c.kind === "NH") {
     const n = c.code.replace("NH-", "");
-    return [
-      `National Highway ${n} (India)`,
-      `National Highway ${n}`,
-      `NH ${n} (India)`,
-    ];
+    return [`National Highway ${n} (India)`, `National Highway ${n}`, `NH ${n} (India)`];
   }
-  if (c.kind === "SH") {
-    const n = c.code.replace("SH-", "");
-    return [`State Highway ${n} (India)`];
-  }
+  if (c.kind === "SH") return [`State Highway ${c.code.replace("SH-", "")} (India)`];
   if (c.kind === "AH") {
     const n = c.code.replace("AH-", "");
     return [`AH${n}`, `Asian Highway ${n}`];
   }
-  return [c.label];
+  if (c.kind === "AIRPORT") {
+    const bare = label.replace(/\s+(International\s+)?Airport$/i, "");
+    return [label, bare + " Airport", bare + " International Airport", bare];
+  }
+  if (c.kind === "PORT") {
+    const bare = label.replace(/\s+Port$/i, "");
+    return [label, bare + " Port", "Port of " + bare, bare + " Port Trust", bare];
+  }
+  if (c.kind === "ZONE" || c.kind === "DFC" || c.kind === "RAIL") {
+    return [label, label + " (India)", label.replace(/ rail line$/, "")+" railway line"];
+  }
+  return [label];
 }
 
 async function findPage(titles) {
@@ -107,7 +116,7 @@ async function main() {
   let corridors = [];
   try {
     const news = JSON.parse(await readFile(resolve(ROOT, "data", "news.json"), "utf8"));
-    corridors = (news.corridors || []).slice(0, MAX_CORRIDORS);
+    corridors = news.corridors || [];
   } catch {
     console.log("data/news.json not found, run scripts/fetch-feeds.mjs first.");
     process.exit(0);
@@ -128,12 +137,23 @@ async function main() {
   const out = { ...prior };
   let fetched = 0, skipped = 0, missed = 0;
 
-  for (const c of corridors) {
-    if (out[c.code] && out[c.code].checked) {
-      // Refresh only if it has been more than 30 days.
-      const age = Date.now() - new Date(out[c.code].checked).getTime();
-      if (age < 30 * 864e5) { skipped++; continue; }
-    }
+  // Never checked first, then whatever was checked longest ago. Assets with
+  // news attached come before empty ones within each group.
+  const due = corridors.filter((c) => {
+    const e = out[c.code];
+    if (!e || !e.checked) return true;
+    return Date.now() - new Date(e.checked).getTime() >= REFRESH_DAYS * 864e5;
+  }).sort((a, b) => {
+    const ea = out[a.code], eb = out[b.code];
+    if (!ea !== !eb) return ea ? 1 : -1;
+    return (b.count || 0) - (a.count || 0);
+  });
+
+  skipped = corridors.length - due.length;
+  const batch = due.slice(0, BATCH);
+  console.log(`${corridors.length} assets on record, ${due.length} due, doing ${batch.length} this run.`);
+
+  for (const c of batch) {
     const page = await findPage(candidates(c));
     if (!page) {
       out[c.code] = { checked: new Date().toISOString(), found: false, events: [] };
@@ -158,7 +178,9 @@ async function main() {
   await mkdir(resolve(ROOT, "data"), { recursive: true });
   await writeFile(resolve(ROOT, "data", "history.json"),
     JSON.stringify({ updated: new Date().toISOString(), corridors: out }), "utf8");
+  const withHistory = Object.values(out).filter((e) => e.found).length;
   console.log(`\nWrote data/history.json - ${fetched} fetched, ${skipped} already current, ${missed} not found.`);
+  console.log(`${withHistory} of ${corridors.length} assets now have a published history.`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
