@@ -754,9 +754,31 @@ async function main() {
       if (it.published > e.last) e.last = it.published;
     }
   }
+  // Merge the published inventory so the full network is browsable, not only
+  // the assets that happened to make the news. Anything with no coverage shows
+  // with a count of nil rather than being absent.
+  try {
+    const inv = JSON.parse(await readFile(resolve(ROOT, "data", "inventory.json"), "utf8"));
+    let added = 0;
+    for (const a of inv.assets || []) {
+      if (corridorMap.has(a.code)) {
+        const e = corridorMap.get(a.code);
+        if (a.lengthKm && !e.lengthKm) e.lengthKm = a.lengthKm;
+        if (a.note && !e.note) e.note = a.note;
+        if (a.iata && !e.iata) e.iata = a.iata;
+        continue;
+      }
+      corridorMap.set(a.code, { code: a.code, kind: a.kind, label: a.label, count: 0,
+        states: {}, first: null, last: null,
+        lengthKm: a.lengthKm, note: a.note, iata: a.iata });
+      added++;
+    }
+    console.log(`Inventory merged: ${added} assets with no coverage yet.`);
+  } catch { console.log("No data/inventory.json; run scripts/fetch-inventory.mjs to list the full network."); }
+
   const corridors = [...corridorMap.values()]
-    .map((e) => ({ ...e, states: Object.keys(e.states).sort((a, b) => e.states[b] - e.states[a]).slice(0, 6) }))
-    .sort((a, b) => b.count - a.count);
+    .map((e) => ({ ...e, states: Object.keys(e.states || {}).sort((a, b) => e.states[b] - e.states[a]).slice(0, 6) }))
+    .sort((a, b) => b.count - a.count || String(a.label).localeCompare(String(b.label), undefined, { numeric: true }));
 
   // Curated macro / environmental / social / geopolitical timeline.
   let macro = [];
