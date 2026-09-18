@@ -224,6 +224,11 @@ button.tag:hover{border-color:var(--blue);color:var(--blue)}
 .foot-upd{border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:8px;margin-bottom:9px;
   font-family:inherit;font-variant-numeric:tabular-nums;font-size:.74rem}
 
+.ref-li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;background:var(--box);
+  border:1px solid var(--bd-lt);border-left:4px solid var(--bd);margin-bottom:6px;padding:8px 12px;
+  font-size:.84rem;line-height:1.5;color:var(--tx-mid)}
+.ref-tag{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx-faint)}
+
 /* ---------- stated figures ---------- */
 .pp-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:11px}
 .pp-fig{background:var(--blue-lt);border:1px solid var(--bd-lt);padding:7px 11px;min-width:190px}
@@ -325,7 +330,7 @@ body.hc .mkind,body.hc .vchk{background:#EDED00;color:#000}
 body.hc .chart-wrap,body.hc .tbl th,body.hc .tbl td,body.hc .tbl tr:nth-child(even) td,body.hc .rep{background:#000;color:#fff;border-color:#fff}
 body.hc .chart .ax{fill:#EDED00}
 body.hc .chart .gl,body.hc .chart .axl{stroke:#fff}
-body.hc .detail,body.hc .src-li,body.hc .pp-fig{background:#000;border-color:#fff;color:#fff}
+body.hc .detail,body.hc .src-li,body.hc .pp-fig,body.hc .ref-li{background:#000;border-color:#fff;color:#fff}
 body.hc .pp-d.up,body.hc .pp-d.dn,body.hc .pp-v{color:#EDED00}
 body.hc .src-go{background:#EDED00;color:#000}
 
@@ -420,7 +425,6 @@ body.hc .src-go{background:#EDED00;color:#000}
         </div>
       </div>
     </div>
-    <div id="corridorDash"></div>
     <div id="corridorBody"></div>
   </section>
 
@@ -446,9 +450,6 @@ body.hc .src-go{background:#EDED00;color:#000}
     </aside>
   </div>
 </div>
-
-
-    <div id="dashHost"></div>
   <div id="eventsBlock">
     <div class="box">
       <div class="box-h">Events On Record
@@ -723,15 +724,13 @@ body.hc .src-go{background:#EDED00;color:#000}
     $("viewFeed").classList.toggle("hide", v!=="feed");
     $("viewCorridor").classList.toggle("hide", v!=="corridor");
     $("eventsBlock").classList.toggle("hide", v!=="feed");
-    $("dashHost").classList.toggle("hide", v!=="feed");
     $("eventsBlock").classList.toggle("hide", v!=="feed");
-    $("dashHost").classList.toggle("hide", v!=="feed");
     if (v==="feed"){
       setUrl(null);
-      $("corridorBody").innerHTML=""; $("corridorDash").innerHTML="";
-      render(); renderMacro(); renderDash("dashHost", null);
+      $("corridorBody").innerHTML="";
+      render(); renderMacro();
     } else {
-      $("macroBody").innerHTML=""; $("dashHost").innerHTML="";
+      $("macroBody").innerHTML="";
       renderCorridor();
     }
   }
@@ -1005,7 +1004,7 @@ body.hc .src-go{background:#EDED00;color:#000}
 
   function renderCorridor(){
     $("feed").innerHTML = ""; $("count").textContent = "";
-    if(!corridor){ $("corridorDash").innerHTML=""; renderCorridorList(); return; }
+    if(!corridor){ renderCorridorList(); return; }
     $("backBtn").style.display = "";
 
     var list = itemsOn(corridor).sort(function(a,b){ return new Date(b.published)-new Date(a.published); });
@@ -1031,17 +1030,14 @@ body.hc .src-go{background:#EDED00;color:#000}
       '<b>'+past.length+'</b> past events · <b>'+fwd.length+'</b> ahead<br>' +
       'earliest '+fmtDate(list[list.length-1].published)+'</div></div></div>';
 
-    html += section("What has happened", "Already on the ground. Newest first, grouped by year.",
-                    past, true);
+    html += combinedHtml(corridor, past);
     html += section("What is coming", "Announced, sanctioned, awarded or under construction. Sorted by stated target year, these are claims from the source, not commitments.",
                     fwd, false);
     html += pipelineHtml(corridor);
-    html += backgroundHtml(corridor);
     html += nearbyHtml(list);
 
     $("corridorBody").innerHTML = html;
     bindRows();
-    renderDash("corridorDash", corridor);
   }
 
   function section(title, desc, list, byYear){
@@ -1114,6 +1110,38 @@ body.hc .src-go{background:#EDED00;color:#000}
       '</div></div>';
   }
 
+  // One chronology per corridor: collected reports and the published record,
+  // newest first, so the whole history reads in a single pass.
+  function combinedHtml(code, past){
+    var h = (bg.corridors||{})[code];
+    var entries = past.map(function(i){
+      return { when: i.published.slice(0,10), year: yearOf(i.published), kind: "news", item: i };
+    });
+    (h && h.found ? (h.events||[]) : []).forEach(function(e){
+      entries.push({ when: (e.date.length===4 ? e.date+"-12-31" : e.date+"-28"),
+                     year: parseInt(e.date,10), kind: "ref", text: e.text });
+    });
+    entries.sort(function(a,b){ return b.when.localeCompare(a.when); });
+
+    var out = '<div class="sec"><div class="sec-h"><h3 class="sec-t">Timeline</h3>' +
+      '<p class="sec-d">Everything on record, newest first. Collected reports, plus the published history where one exists.</p></div>';
+    if(!entries.length) return out + '<p class="sec-d" style="padding:9px 11px">Nothing on record.</p></div>';
+
+    var cur = null;
+    out += '<ul class="feed">';
+    entries.forEach(function(e){
+      if(e.year!==cur){ cur=e.year; out += '<li class="year">'+cur+'</li>'; }
+      out += e.kind==="news" ? rowHtml(e.item)
+        : '<li class="ref-li"><span class="ref-tag">Record</span><span>'+esc(e.text)+'</span></li>';
+    });
+    out += '</ul>';
+    if(h && h.found && h.url){
+      out += '<p class="wsrc" style="padding:0 11px 10px">Published history from <a href="'+esc(h.url)+
+        '" target="_blank" rel="noopener noreferrer">'+esc(h.article)+'</a>. Reference only, chase the citation before using it.</p>';
+    }
+    return out + '</div>';
+  }
+
   function backgroundHtml(code){
     var h = (bg.corridors||{})[code];
     if(!h || !h.found) return "";
@@ -1182,8 +1210,11 @@ body.hc .src-go{background:#EDED00;color:#000}
       '<ul class="clist">' + list.slice(0,400).map(function(c){
         return '<li><button class="ccard" data-corridor="'+esc(c.code)+'" style="--bar:'+(colorFor[c.kind]||"#6B6B66")+'">' +
           '<div class="ccard-in"><span class="ccard-code">'+esc(c.label)+'</span>' +
-          '<span class="ccard-st">'+esc((c.states||[]).slice(0,3).join(", ")||KIND[c.kind]||"")+'</span>' +
-          '<span class="ccard-n">'+c.count+' item'+(c.count===1?"":"s")+' · to '+fmtDate(c.last)+'</span>' +
+          '<span class="ccard-st">'+esc((c.states||[]).slice(0,3).join(", ")||c.note||KIND[c.kind]||"")+'</span>' +
+          '<span class="ccard-n">'+(c.count
+              ? c.count+' item'+(c.count===1?"":"s")+(c.last?' · to '+fmtDate(c.last):"")
+              : 'No coverage yet')+
+            (c.lengthKm?' · '+c.lengthKm+' km':'')+'</span>' +
           '</div></button></li>'; }).join("") + '</ul>';
     $("corridorBody").querySelectorAll("[data-corridor]").forEach(function(b){
       b.addEventListener("click", function(){ corridor=b.dataset.corridor; setUrl(corridor); renderCorridor(); });
