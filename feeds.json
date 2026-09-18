@@ -259,6 +259,101 @@
       "name": "Infrastructure divestment and stake sales",
       "query": "India infrastructure divestment OR stake sale OR InvIT roads OR airports OR ports",
       "gate": false
+    },
+    {
+      "name": "Construction World",
+      "query": "site:constructionworld.in roads OR railways OR ports OR aviation",
+      "gate": false
+    },
+    {
+      "name": "Indian Infrastructure",
+      "query": "site:indianinfrastructure.com roads OR railways OR ports OR aviation OR logistics",
+      "gate": false
+    },
+    {
+      "name": "India Infra Hub",
+      "query": "site:indiainfrahub.com roads OR railways OR aviation OR ports OR metro",
+      "gate": false
+    },
+    {
+      "name": "ET Infra",
+      "query": "site:infra.economictimes.indiatimes.com",
+      "gate": false
+    },
+    {
+      "name": "EPC World",
+      "query": "site:epcworld.in roads OR railways OR ports OR airports",
+      "gate": false
+    },
+    {
+      "name": "NBM&CW",
+      "query": "site:nbmcw.com highway OR bridge OR tunnel OR metro",
+      "gate": false
+    },
+    {
+      "name": "Projects Today",
+      "query": "site:projectstoday.com road OR rail OR port OR airport",
+      "gate": false
+    },
+    {
+      "name": "Metro Rail News",
+      "query": "site:metrorailnews.in",
+      "gate": false
+    },
+    {
+      "name": "Urban Transport News",
+      "query": "site:urbantransportnews.com",
+      "gate": false
+    },
+    {
+      "name": "Rail Analysis",
+      "query": "site:railanalysis.com",
+      "gate": false
+    },
+    {
+      "name": "The Metro Rail Guy",
+      "query": "site:themetrorailguy.com",
+      "gate": false
+    },
+    {
+      "name": "Maritime Gateway",
+      "query": "site:maritimegateway.com",
+      "gate": false
+    },
+    {
+      "name": "Logistics Insider",
+      "query": "site:logisticsinsider.in",
+      "gate": false
+    },
+    {
+      "name": "Cargo Talk",
+      "query": "site:cargotalk.in",
+      "gate": false
+    },
+    {
+      "name": "STAT Times",
+      "query": "site:stattimes.com air cargo OR logistics India",
+      "gate": false
+    },
+    {
+      "name": "Moneycontrol infrastructure",
+      "query": "site:moneycontrol.com NHAI OR highway OR airport OR port project",
+      "gate": false
+    },
+    {
+      "name": "Financial Express infrastructure",
+      "query": "site:financialexpress.com infrastructure roads OR railways OR airports OR ports",
+      "gate": false
+    },
+    {
+      "name": "Business Standard infrastructure",
+      "query": "site:business-standard.com NHAI OR highway OR railways OR port project",
+      "gate": false
+    },
+    {
+      "name": "Mint infrastructure",
+      "query": "site:livemint.com infrastructure highway OR railway OR airport OR port",
+      "gate": false
     }
   ]
 }
