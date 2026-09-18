@@ -662,7 +662,11 @@ async function main() {
   const fresh = [];
   const sourceLog = [];
 
+  let n = 0;
   for (const t of targets) {
+    // A short gap between requests. Publishers answer an unpaced burst with an
+    // empty feed rather than an error, which looks like a dead source.
+    if (n++) await new Promise((r) => setTimeout(r, 400));
     try {
       const cookie = t.warm ? await warmSession(t.warm) : "";
       let items = t.type === "pib-allrel"
