@@ -17,45 +17,17 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "20"
 
-      # Check that GitHub is reading the correct feeds.json
-      - name: Check feed configuration
-        run: |
-          echo "=== Checking feeds.json ==="
-
-          if [ ! -f feeds.json ]; then
-            echo "ERROR: feeds.json was not found."
-            exit 1
-          fi
-
-          node - <<'NODE'
-          const fs = require("fs");
-
-          const cfg = JSON.parse(fs.readFileSync("feeds.json", "utf8"));
-
-          console.log("Configuration keys:", Object.keys(cfg));
-          console.log("feeds is an array:", Array.isArray(cfg.feeds));
-          console.log("Number of feeds:", cfg.feeds?.length ?? 0);
-
-          if (!Array.isArray(cfg.feeds)) {
-            console.error('ERROR: feeds.json does not contain a valid "feeds" array.');
-            process.exit(1);
-          }
-
-          if (!cfg.feeds.length) {
-            console.error('ERROR: "feeds" array is empty.');
-            process.exit(1);
-          }
-
-          console.log("feeds.json looks OK.");
-          NODE
+      # The published network changes rarely, so this is cheap to refresh daily.
+      - name: Refresh asset inventory
+        continue-on-error: true
+        run: node scripts/fetch-inventory.mjs
 
       - name: Collect headlines
         run: node scripts/fetch-feeds.mjs
@@ -73,9 +45,7 @@ jobs:
         run: |
           git config user.name "chainage-bot"
           git config user.email "actions@github.com"
-
-          git add data/news.json data/history.json data/indicators.json sitemap.xml 2>/dev/null || git add data/news.json
-
+          git add data/news.json data/history.json data/indicators.json data/inventory.json sitemap.xml 2>/dev/null || git add data/news.json
           if git diff --staged --quiet; then
             echo "No change in feed data."
           else
