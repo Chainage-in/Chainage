@@ -377,8 +377,8 @@ body.hc .src-go{background:#EDED00;color:#000}
 
 <nav class="navbar" aria-label="Main">
   <div class="wrap tabs" role="tablist">
-    <button class="tab" id="tabFeed" role="tab" aria-selected="true">Timeline</button>
-    <button class="tab" id="tabCorridor" role="tab" aria-selected="false">Corridor</button>
+    <button class="tab" id="tabCorridor" role="tab" aria-selected="true">Assets</button>
+    <button class="tab" id="tabFeed" role="tab" aria-selected="false">Latest</button>
   </div>
 </nav>
 
@@ -390,7 +390,7 @@ body.hc .src-go{background:#EDED00;color:#000}
       <div class="board" id="board" role="group" aria-label="Filter by mode"></div>
     </div>
 
-  <section id="viewFeed">
+  <section id="viewFeed" class="hide">
     <div class="box">
       <div class="box-h">Search and Filters</div>
       <div class="box-b">
@@ -414,7 +414,7 @@ body.hc .src-go{background:#EDED00;color:#000}
   </section>
 
   <!-- ============ CORRIDOR VIEW ============ -->
-  <section id="viewCorridor" class="hide">
+  <section id="viewCorridor">
     <div class="box" style="margin-top:14px">
       <div class="box-h">Select an Asset <span class="sub">Pick a mode above, then choose from that mode</span></div>
       <div class="box-b">
@@ -450,7 +450,7 @@ body.hc .src-go{background:#EDED00;color:#000}
     </aside>
   </div>
 </div>
-  <div id="eventsBlock">
+  <div id="eventsBlock" class="hide">
     <div class="box">
       <div class="box-h">Events On Record
         <span class="sub">Curated chronology of what has moved traffic. Verify before citing</span></div>
@@ -543,7 +543,7 @@ body.hc .src-go{background:#EDED00;color:#000}
   var clips = load();
   var openEditor = null;
   var openDetail = null;
-  var view = "feed";
+  var view = "corridor";
   var corridor = null;
   var bg = { corridors: {} };   // corridor background from Wikipedia
   var mf = { q:"", kind:"", mode:"" };
@@ -624,7 +624,7 @@ body.hc .src-go{background:#EDED00;color:#000}
     buildBoard(); buildChips(); buildSelects(); buildKindOptions(); wire();
 
     var p = new URLSearchParams(location.search).get("corridor");
-    if (p) { corridor = p; switchTo("corridor"); } else { switchTo("feed"); }
+    if (p) { corridor = p; switchTo("corridor"); } else { switchTo("corridor"); }
     renderClips();
   }
 
