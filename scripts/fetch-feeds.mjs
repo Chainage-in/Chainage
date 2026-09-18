@@ -861,10 +861,16 @@ async function main() {
   try { site = (await readFile(resolve(ROOT, "site.txt"), "utf8")).trim().replace(/\/+$/, ""); } catch {}
   if (site) {
     const today = new Date().toISOString().slice(0, 10);
+    // Only list assets that actually have something on them. An inventory entry
+    // with no coverage has no last-seen date, and an empty page is not worth
+    // asking a search engine to crawl.
     const urls = ['<url><loc>' + site + '/</loc><lastmod>' + today + '</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>']
-      .concat(corridors.slice(0, 900).map((c) =>
-        '<url><loc>' + site + '/?corridor=' + encodeURIComponent(c.code) +
-        '</loc><lastmod>' + c.last.slice(0, 10) + '</lastmod><changefreq>weekly</changefreq></url>'));
+      .concat(corridors
+        .filter((c) => c.count > 0 && c.last)
+        .slice(0, 900)
+        .map((c) =>
+          '<url><loc>' + site + '/?corridor=' + encodeURIComponent(c.code) +
+          '</loc><lastmod>' + String(c.last).slice(0, 10) + '</lastmod><changefreq>weekly</changefreq></url>'));
     await writeFile(resolve(ROOT, "sitemap.xml"),
       '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
       urls.join("\n") + "\n</urlset>\n", "utf8");
