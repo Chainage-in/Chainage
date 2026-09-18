@@ -354,7 +354,27 @@ const TRANSPORT_GATE = ["highway","road","toll","nhai","morth","expressway","rai
   "wholesale price index","consumer price index","index of industrial production","gross domestic product","gdp","e-way bill","gst collection","core sector","iip","mining production","coal production","steel production","cement production"];
 
 const lc = (s) => String(s || "").toLowerCase();
-const hits = (text, terms) => terms.reduce((n, t) => n + (text.includes(t) ? 1 : 0), 0);
+
+// Plain substring matching is wrong here: "ban" matches inside "Bhubaneswar",
+// "port" inside "report" and "transport", "rail" inside "trail". Every term is
+// compiled once into a word-boundary regex instead. Multi-word phrases still
+// match as phrases, they just cannot start or end mid-word.
+const TERM_RE = new Map();
+function termRegex(term) {
+  let re = TERM_RE.get(term);
+  if (!re) {
+    const esc = term.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const t = term.trim();
+    const left = /^[a-z0-9]/i.test(t) ? "\\b" : "";
+    // Allow ordinary inflections so "airport" still matches "airports" and
+    // "close" matches "closed", without letting "ban" reach into "Bhubaneswar".
+    const right = /[a-z]$/i.test(t) ? "(?:s|es|ed|d|ing)?\\b" : (/[0-9]$/.test(t) ? "\\b" : "");
+    re = new RegExp(left + esc + right, "i");
+    TERM_RE.set(term, re);
+  }
+  return re;
+}
+const hits = (text, terms) => terms.reduce((n, t) => n + (termRegex(t).test(text) ? 1 : 0), 0);
 
 function firstMatch(text, table) {
   for (const row of table) if (hits(text, row.terms) > 0) return row.id;
@@ -446,13 +466,15 @@ function classify(title, summary) {
     maturity,
     horizon,
     targetYear: years.length ? Math.min(...years) : null,
-    regions: STATES.filter((s) => text.includes(lc(s))).slice(0, 5),
+    regions: STATES.filter((s) => termRegex(lc(s)).test(text)).slice(0, 5),
     corridors,
   };
 }
 
-const isTransportRelevant = (i) =>
-  TRANSPORT_GATE.some((t) => lc(`${i.title} ${i.summary}`).includes(t));
+const isTransportRelevant = (i) => {
+  const text = lc(`${i.title} ${i.summary}`);
+  return TRANSPORT_GATE.some((t) => termRegex(t).test(text));
+};
 
 /* ================================================================== */
 /* Helpers                                                             */
