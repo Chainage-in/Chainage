@@ -47,7 +47,6 @@
 <url><loc>https://chainage.in/?corridor=SEA%3APipavav-Port</loc><lastmod>2026-10-20</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=EXP%3APune-Ring-Road</loc><lastmod>2026-10-23</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=ZONE%3ASouth-Eastern-Railway</loc><lastmod>2026-10-28</lastmod><changefreq>weekly</changefreq></url>
-<url><loc>https://chainage.in/?corridor=SEA%3ATuna-Tekra-Port</loc><lastmod>2026-10-21</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=EXP%3AAwadh-Expressway</loc><lastmod>2026-10-19</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=EXP%3ADehradun-Delhi-Expressway</loc><lastmod>2026-07-02</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3AIndore-Airport</loc><lastmod>2026-09-23</lastmod><changefreq>weekly</changefreq></url>
@@ -59,6 +58,7 @@
 <url><loc>https://chainage.in/?corridor=ZONE%3ANorth-Central-Railway</loc><lastmod>2026-10-27</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=ZONE%3ASouth-Central-Railway</loc><lastmod>2026-09-25</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3ASrinagar-Airport</loc><lastmod>2026-10-29</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://chainage.in/?corridor=SEA%3ATuna-Tekra-Port</loc><lastmod>2026-10-21</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=SEA%3ATuticorin-Port</loc><lastmod>2026-10-23</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3AVaranasi-Airport</loc><lastmod>2026-10-25</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3AVisakhapatnam-Airport</loc><lastmod>2026-10-27</lastmod><changefreq>weekly</changefreq></url>
@@ -109,6 +109,7 @@
 <url><loc>https://chainage.in/?corridor=EXP%3ABangalore-Vijayawada-Expressway</loc><lastmod>2026-05-03</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3ABanswara-Ratlam</loc><lastmod>2026-08-07</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3ABarbil-Bolanikhadan</loc><lastmod>2026-09-28</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://chainage.in/?corridor=RAIL%3ABarkheda-Budhni</loc><lastmod>2026-10-30</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=EXP%3ABengaluru-Mysuru-Expressway</loc><lastmod>2026-07-24</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3ABhopal-Airport</loc><lastmod>2026-04-01</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=AIR%3ABiju-Patnaik-International-Airport</loc><lastmod>2026-04-17</lastmod><changefreq>weekly</changefreq></url>
@@ -153,6 +154,7 @@
 <url><loc>https://chainage.in/?corridor=EXP%3AKanpur-Expressway</loc><lastmod>2026-08-06</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=EXP%3AKona-Expressway</loc><lastmod>2026-10-16</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3AKonark-Puri</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://chainage.in/?corridor=ZONE%3AKonkan-Railway</loc><lastmod>2026-10-30</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3AKotipalli-Narsapur</loc><lastmod>2026-10-03</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3ALakhpat-Vayor</loc><lastmod>2026-10-12</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=RAIL%3AMadurai-Rajapalayam</loc><lastmod>2026-09-30</lastmod><changefreq>weekly</changefreq></url>
@@ -171,6 +173,7 @@
 <url><loc>https://chainage.in/?corridor=NH-24</loc><lastmod>2026-08-07</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=NH-25</loc><lastmod>2026-08-03</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=NH-32</loc><lastmod>2026-10-14</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://chainage.in/?corridor=NH-47</loc><lastmod>2026-10-30</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=NH-53</loc><lastmod>2026-10-09</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=NH-55</loc><lastmod>2026-10-09</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://chainage.in/?corridor=NH-56</loc><lastmod>2026-05-18</lastmod><changefreq>weekly</changefreq></url>
